@@ -4,7 +4,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const index_1 = __importDefault(require("./src/index"));
-const server = index_1.default.listen(3000, () => {
+const PORT = process.env.PORT || 3055;
+const server = index_1.default.listen(PORT, () => {
     console.log('The application is listening on port 3000!');
 });
 process.on('SIGINT', () => {

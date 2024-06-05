@@ -1,6 +1,7 @@
 import app from './src/index'
-const server = app.listen(3000, () => {
-    console.log('The application is listening on port 3000!');
+const PORT = process.env.PORT || 3055
+const server = app.listen(PORT, () => {
+    console.log(`The application is listening on port ${PORT}!`);
 })
 
 process.on('SIGINT', () => {

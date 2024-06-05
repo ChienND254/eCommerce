@@ -43,6 +43,5 @@ const PRO: Config = {
 const config: EnvConfig = { DEV, PRO };
 
 const env = (process.env.NODE_ENV || 'DEV') as keyof EnvConfig;
-const selectedConfig: Config = config[env];
 
-export default selectedConfig;
+export default config[env];

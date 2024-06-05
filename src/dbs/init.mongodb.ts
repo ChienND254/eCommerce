@@ -1,7 +1,7 @@
 import * as mongoose from 'mongoose';
 import {countConnect} from '../helpers/check.connect';
-import selectedConfig from '../configs/config.mongodb'
-const {host, port, name} = selectedConfig.db
+import config from '../configs/config.mongodb'
+const {host, port, name} = config.db
 const connectString: string = `mongodb://${host}:${port}/${name}`;
 console.log(connectString)
 class Database {

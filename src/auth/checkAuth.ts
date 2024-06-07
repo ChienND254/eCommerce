@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import findByID from '../services/apiKey.service';
 import { IApiKey } from '../models/apikey.model';
+import { BadRequestError } from '../core/error.response';
 const HEADER = {
     API_KEY: 'x-api-key',
     AUTHORIZATION: 'authorization'
@@ -9,52 +10,37 @@ const HEADER = {
 interface CustomRequest extends Request {
     objKey?: IApiKey;
 }
-const apiKey = async (req: CustomRequest, res: Response, next: NextFunction) => {
-    try {
-        const key:string = req.headers[HEADER.API_KEY] as string;
-        if (!key) {
-            return res.status(403).json({
-                message: 'Forbidden Error'
-            })
-        }
-
-        //check object
-        const objKey:IApiKey | null = await findByID(key)
-        if (!objKey) {
-            return res.status(403).json({
-                message: 'Forbidden Error: Invalid API key'
-            });
-        }
-        req.objKey = objKey;
-        return next()
-    } catch (error) {
-        console.error('Error in API key middleware:', error);
-        return res.status(500).json({
-            message: 'Internal Server Error'
-        });
+const apiKey = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
+    const key: string = req.headers[HEADER.API_KEY] as string;
+    if (!key) {
+        return next(new BadRequestError('Forbidden Error', 403))
     }
+
+    //check object
+    const objKey: IApiKey | null = await findByID(key)
+    if (!objKey) {
+        return next(new BadRequestError('Forbidden Error: Invalid API key', 403))
+    }
+    req.objKey = objKey;
+    next()
 }
 
-const permission = (permission:string) => {
-    return (req: CustomRequest, res: Response, next: NextFunction) => {
+const permission = (permission: string) => {
+    return (req: CustomRequest, res: Response, next: NextFunction): void => {
         if (!req.objKey?.permissions) {
-            return res.status(500).json({
-                message: 'Permission denied'
-            });
+            return next(new BadRequestError('Permission denied', 403))
         }
         const validPermissions = req.objKey?.permissions.includes(permission)
         if (!validPermissions) {
-            return res.status(500).json({
-                message: 'Permission denied'
-            });
+            return next(new BadRequestError('Permission denied', 403))
         }
-        return next()
+        next()
     }
 }
 
-const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>) => {
+const asyncHandler = (fn: (req: Request, res: Response, next: NextFunction) => Promise<any>): ((req: Request, res: Response, next: NextFunction) => void)=> {
     return (req: Request, res: Response, next: NextFunction) => {
         fn(req, res, next).catch(next)
     }
 }
-export {apiKey, permission, asyncHandler};
+export { apiKey, permission, asyncHandler };

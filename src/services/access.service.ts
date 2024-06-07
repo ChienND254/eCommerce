@@ -1,10 +1,11 @@
-import {ShopModel, IShop} from '../models/shop.model';
+import { ShopModel, IShop } from '../models/shop.model';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import KeyTokenService from './keyToken.service';
 import { createTokenPair } from '../auth/authUtils';
 import getInfoData from '../utils';
 import { BadRequestError } from '../core/error.response';
+import { findByEmail } from './shop.service';
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -15,78 +16,68 @@ const RoleShop = {
 
 
 interface ServiceResponse {
-    code: string;
-    message?: string;
-    status?: string;
-    metadata?: {
-        shop: Pick<IShop, '_id' | 'name' | 'email'>; 
-        tokens: {
-            accessToken: string;
-            refreshToken: string;
-        };
-    } | null;
+    shop: Pick<IShop, '_id' | 'name' | 'email'>;
+    tokens: {
+        accessToken: string;
+        refreshToken: string;
+    };
 }
 
 class AccessService {
-    static signUp = async ({ name, email, password }: { name: string, email: string, password: string }): Promise<ServiceResponse> => {
-        try {
-            const holderShop = await ShopModel.findOne({ email }).lean();
-            if (holderShop) {
-                throw new BadRequestError('Error: Shod already registered')
-            }
-            const passwordHash: string = await bcrypt.hash(password, 10);
-            const newShop = await ShopModel.create({
-                name,
-                email,
-                password: passwordHash,
-                roles: [RoleShop.SHOP]
-            });
+    static login = async ({email, password, refreshToken = null}: {email:string, password: string, refreshToken: string | null}) => {
+        const foundShop: IShop | null = await findByEmail({email})
+        if(!foundShop) throw new BadRequestError('Shop not registered');
 
-            if (newShop) {
-                // const { publicKey, privateKey }: { publicKey: string, privateKey: string } = crypto.generateKeyPairSync('rsa', {
-                //     modulusLength: 4096,
-                //     publicKeyEncoding: {
-                //         type: 'pkcs1',
-                //         format: 'pem'
-                //     },
-                //     privateKeyEncoding: {
-                //         type: 'pkcs1',
-                //         format: 'pem'
-                //     }
-                // });
-                const privateKey:string = crypto.randomBytes(64).toString('hex')
-                const publicKey:string = crypto.randomBytes(64).toString('hex')
-
-                const keyStore = await KeyTokenService.createKeyToken({
-                    userId: newShop._id,
-                    publicKey,
-                    privateKey
-                })
-
-                if (!keyStore) {
-                    throw new BadRequestError('KeyStore Error')
-                }
-                const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
-
-                return {
-                    code: '201',
-                    metadata: {
-                        shop: getInfoData({fields: ['_id', 'name', 'email'], object: newShop}),
-                        tokens
-                    }
-                }
-            }
-            return {
-                code: '200',
-                metadata: null
-            }
-        } catch (error: any) {
-            return {
-                code: 'xxx',
-                message: error.message,
-                status: 'error'
-            };
+        const match: Promise<boolean> = bcrypt.compare(password, foundShop.password)
+    }
+    static signUp = async ({ name, email, password }: { name: string, email: string, password: string }): Promise<ServiceResponse | null> => {
+        if (!name || !email || !password) {
+            throw new BadRequestError('Name, email, and password are required fields');
         }
+        const holderShop = await ShopModel.findOne({ email }).lean();
+        if (holderShop) {
+            throw new BadRequestError('Error: Shod already registered')
+        }
+        const passwordHash: string = await bcrypt.hash(password, 10);
+        const newShop = await ShopModel.create({
+            name,
+            email,
+            password: passwordHash,
+            roles: [RoleShop.SHOP]
+        });
+
+        if (newShop) {
+            // const { publicKey, privateKey }: { publicKey: string, privateKey: string } = crypto.generateKeyPairSync('rsa', {
+            //     modulusLength: 4096,
+            //     publicKeyEncoding: {
+            //         type: 'pkcs1',
+            //         format: 'pem'
+            //     },
+            //     privateKeyEncoding: {
+            //         type: 'pkcs1',
+            //         format: 'pem'
+            //     }
+            // });
+            const privateKey: string = crypto.randomBytes(64).toString('hex')
+            const publicKey: string = crypto.randomBytes(64).toString('hex')
+
+            const keyStore = await KeyTokenService.createKeyToken({
+                userId: newShop._id,
+                publicKey,
+                privateKey
+            })
+
+            if (!keyStore) {
+                throw new BadRequestError('KeyStore Error', 403)
+            }
+            const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
+
+            return {
+                shop: getInfoData({ fields: ['_id', 'name', 'email'], object: newShop }),
+                tokens
+            }
+        }
+        return null;
     }
 }
 

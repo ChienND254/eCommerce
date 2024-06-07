@@ -3,7 +3,8 @@ import {model, Schema, Document} from 'mongoose';
 interface IKeyToken extends Document {
     user: string; // Assuming user is a string (maybe the user's ID)
     publicKey: string;
-    refreshToken: string[];
+    refreshToken: string;
+    refreshTokensUsed: string[];
 }
 
 const DOCUMENT_NAME:string = 'Key'
@@ -23,9 +24,10 @@ const keyTokenSchema:Schema = new Schema({
         type:String,
         required:true,
     },
-    refreshToken: {
+    refreshTokensUsed: {
         type: Array, default: []
-    }
+    },
+    refreshToken: {type : String, require: true}
 }, {
     timestamps: true,
     collection: COLLECTION_NAME

@@ -29,4 +29,13 @@ class BadRequestError extends ErrorResponse {
     }
 }
 
-export {ConflictRequestError, BadRequestError}
+class AuthFailureError extends ErrorResponse {
+    constructor(message:string = ReasonPhrases.UNAUTHORIZED, statusCode:number = StatusCodes.UNAUTHORIZED) {
+        super(message, statusCode)
+    }
+}
+export {
+    ConflictRequestError, 
+    BadRequestError,
+    AuthFailureError
+}

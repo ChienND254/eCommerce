@@ -4,7 +4,7 @@ import crypto from 'crypto';
 import KeyTokenService from './keyToken.service';
 import { createTokenPair } from '../auth/authUtils';
 import getInfoData from '../utils';
-import { BadRequestError } from '../core/error.response';
+import { AuthFailureError, BadRequestError } from '../core/error.response';
 import { findByEmail } from './shop.service';
 
 const RoleShop = {
@@ -29,6 +29,23 @@ class AccessService {
         if(!foundShop) throw new BadRequestError('Shop not registered');
 
         const match: Promise<boolean> = bcrypt.compare(password, foundShop.password)
+
+        if (!match) throw new AuthFailureError('Authentication error')
+
+        const privateKey: string = crypto.randomBytes(64).toString('hex')
+        const publicKey: string = crypto.randomBytes(64).toString('hex')
+
+        const tokens = await createTokenPair({ userId: foundShop._id, email }, publicKey, privateKey)
+
+        await KeyTokenService.createKeyToken({
+            refreshToken: tokens.refreshToken,
+            privateKey: privateKey,
+            publicKey: publicKey
+        })
+        return {
+            shop: getInfoData({ fields: ['_id', 'name', 'email'], object: foundShop }),
+            tokens
+        }
     }
     static signUp = async ({ name, email, password }: { name: string, email: string, password: string }): Promise<ServiceResponse | null> => {
         if (!name || !email || !password) {

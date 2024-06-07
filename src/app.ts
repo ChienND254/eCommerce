@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import morgan from 'morgan'
 import helmet from 'helmet';
 import compression from 'compression';
@@ -20,4 +20,17 @@ import('./dbs/init.mongodb')
 app.use('/', router)
 
 //handle error
+app.use((req: Request, res: Response, next: NextFunction) => {
+    const error: Error & { status?: number } = new Error('Not found');
+    error.status = 404
+    next(error)
+})
+app.use((error: Error & { status?: number }, req: Request, res: Response, next: NextFunction) => {
+    const statusCode = error.status || 500
+    return res.status(statusCode).json({
+        status: 'error',
+        code: statusCode,
+        message: error.message || "Internal Server Error"
+    })
+})
 export default app;

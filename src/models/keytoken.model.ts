@@ -9,7 +9,7 @@ interface IKeyToken extends Document {
 const DOCUMENT_NAME:string = 'Key'
 const COLLECTION_NAME: string = 'Keys' 
 // Declare the Schema of the Mongo model
-var keyTokenSchema = new Schema({
+const keyTokenSchema:Schema = new Schema({
     userId:{
         type: Schema.Types.ObjectId,
         required: true,
@@ -30,5 +30,5 @@ var keyTokenSchema = new Schema({
     timestamps: true,
     collection: COLLECTION_NAME
 });
-const ShopModel = model<IKeyToken>(DOCUMENT_NAME, keyTokenSchema);
-export default ShopModel;
+const KeyTokenModel = model<IKeyToken>(DOCUMENT_NAME, keyTokenSchema);
+export default KeyTokenModel;

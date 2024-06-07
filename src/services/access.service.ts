@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import KeyTokenService from './keyToken.service';
 import { createTokenPair } from '../auth/authUtils';
 import getInfoData from '../utils';
+import { BadRequestError } from '../core/error.response';
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -31,10 +32,7 @@ class AccessService {
         try {
             const holderShop = await ShopModel.findOne({ email }).lean();
             if (holderShop) {
-                return {
-                    code: 'xxxx',
-                    message: 'Shop already registered'
-                };
+                throw new BadRequestError('Error: Shod already registered')
             }
             const passwordHash: string = await bcrypt.hash(password, 10);
             const newShop = await ShopModel.create({
@@ -66,10 +64,7 @@ class AccessService {
                 })
 
                 if (!keyStore) {
-                    return {
-                        code: 'xxx',
-                        message: 'publicKeyString error'
-                    }
+                    throw new BadRequestError('KeyStore Error')
                 }
                 const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
 

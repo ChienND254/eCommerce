@@ -13,7 +13,7 @@ interface IShop extends Document {
 const DOCUMENT_NAME:string = 'Shop'
 const COLLECTION_NAME: string = 'Shops' 
 // Declare the Schema of the Mongo model
-var shopSchema = new Schema({
+const shopSchema:Schema = new Schema({
     name:{
         type:String,
         trim: true,

@@ -1,4 +1,4 @@
-import {model, Schema, Document} from 'mongoose'; // Erase if already required
+import {model, Schema, Document} from 'mongoose';
 
 interface IShop extends Document {
     name: string;
@@ -20,11 +20,6 @@ var shopSchema = new Schema({
         maxLength: 150
     },
     email:{
-        type:String,
-        required:true,
-        unique:true,
-    },
-    mobile:{
         type:String,
         required:true,
         unique:true,
@@ -51,5 +46,5 @@ var shopSchema = new Schema({
     timestamps: true,
     collection: COLLECTION_NAME
 });
-
-export default model<IShop>(DOCUMENT_NAME, shopSchema);
+const ShopModel = model<IShop>(DOCUMENT_NAME, shopSchema);
+export {ShopModel, IShop};

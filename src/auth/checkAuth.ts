@@ -20,7 +20,7 @@ const apiKey = async (req: CustomRequest, res: Response, next: NextFunction): Pr
     const objKey: IApiKey | null = await findByID(key)
     if (!objKey) {
         return next(new BadRequestError('Forbidden Error: Invalid API key', 403))
-    }
+    }    
     req.objKey = objKey;
     next()
 }

@@ -3,7 +3,6 @@ import {model, Schema, Document} from 'mongoose';
 interface IShop extends Document {
     name: string;
     email: string;
-    mobile: string;
     password: string;
     status: 'active' | 'inactive';
     verify: boolean;

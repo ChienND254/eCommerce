@@ -6,6 +6,7 @@ import { createTokenPair } from '../auth/authUtils';
 import getInfoData from '../utils';
 import { AuthFailureError, BadRequestError } from '../core/error.response';
 import { findByEmail } from './shop.service';
+import { ObjectId } from 'mongoose';
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -13,7 +14,6 @@ const RoleShop = {
     EDITOR: 'EDITOR',
     ADMIN: 'ADMIN'
 };
-
 
 interface ServiceResponse {
     shop: Pick<IShop, '_id' | 'name' | 'email'>;
@@ -24,37 +24,43 @@ interface ServiceResponse {
 }
 
 class AccessService {
-    static login = async ({email, password, refreshToken = null}: {email:string, password: string, refreshToken: string | null}) => {
-        const foundShop: IShop | null = await findByEmail({email})
-        if(!foundShop) throw new BadRequestError('Shop not registered');
+    static login = async ({ email, password, refreshToken = null }: { email: string, password: string, refreshToken: string | null }): Promise<ServiceResponse> => {
+        const foundShop: IShop | null = await findByEmail({ email });
+        console.log(foundShop);
+        
+        if (!foundShop) throw new BadRequestError('Shop not registered');
 
-        const match: Promise<boolean> = bcrypt.compare(password, foundShop.password)
+        const match = await bcrypt.compare(password, foundShop.password);
+        if (!match) throw new AuthFailureError('Authentication error');
 
-        if (!match) throw new AuthFailureError('Authentication error')
+        const privateKey: string = crypto.randomBytes(64).toString('hex');
+        const publicKey: string = crypto.randomBytes(64).toString('hex');
 
-        const privateKey: string = crypto.randomBytes(64).toString('hex')
-        const publicKey: string = crypto.randomBytes(64).toString('hex')
-
-        const tokens = await createTokenPair({ userId: foundShop._id, email }, publicKey, privateKey)
+        const tokens = await createTokenPair({ userId: foundShop._id, email }, publicKey, privateKey);
 
         await KeyTokenService.createKeyToken({
+            userId: foundShop._id as ObjectId, // Ensure userId is ObjectId
             refreshToken: tokens.refreshToken,
             privateKey: privateKey,
             publicKey: publicKey
-        })
+        });
+
         return {
             shop: getInfoData({ fields: ['_id', 'name', 'email'], object: foundShop }),
             tokens
-        }
+        };
     }
+
     static signUp = async ({ name, email, password }: { name: string, email: string, password: string }): Promise<ServiceResponse | null> => {
         if (!name || !email || !password) {
             throw new BadRequestError('Name, email, and password are required fields');
         }
+
         const holderShop = await ShopModel.findOne({ email }).lean();
         if (holderShop) {
-            throw new BadRequestError('Error: Shod already registered')
+            throw new BadRequestError('Error: Shop already registered');
         }
+
         const passwordHash: string = await bcrypt.hash(password, 10);
         const newShop = await ShopModel.create({
             name,
@@ -64,35 +70,26 @@ class AccessService {
         });
 
         if (newShop) {
-            // const { publicKey, privateKey }: { publicKey: string, privateKey: string } = crypto.generateKeyPairSync('rsa', {
-            //     modulusLength: 4096,
-            //     publicKeyEncoding: {
-            //         type: 'pkcs1',
-            //         format: 'pem'
-            //     },
-            //     privateKeyEncoding: {
-            //         type: 'pkcs1',
-            //         format: 'pem'
-            //     }
-            // });
-            const privateKey: string = crypto.randomBytes(64).toString('hex')
-            const publicKey: string = crypto.randomBytes(64).toString('hex')
+            const privateKey: string = crypto.randomBytes(64).toString('hex');
+            const publicKey: string = crypto.randomBytes(64).toString('hex');
 
             const keyStore = await KeyTokenService.createKeyToken({
-                userId: newShop._id,
+                userId: newShop._id as ObjectId, // Ensure userId is ObjectId
                 publicKey,
-                privateKey
-            })
-
+                privateKey,
+                refreshToken: ''
+            });
+            
             if (!keyStore) {
-                throw new BadRequestError('KeyStore Error', 403)
+                throw new BadRequestError('KeyStore Error', 403);
             }
-            const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey)
+
+            const tokens = await createTokenPair({ userId: newShop._id, email }, publicKey, privateKey);
 
             return {
                 shop: getInfoData({ fields: ['_id', 'name', 'email'], object: newShop }),
                 tokens
-            }
+            };
         }
         return null;
     }

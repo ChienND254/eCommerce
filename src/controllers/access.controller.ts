@@ -3,6 +3,9 @@ import AccessService from '../services/access.service';
 import { CREATED, SuccessResponse } from '../core/success.response';
 class AccessController {
     login = async (req: Request, res: Response, next: NextFunction) => {
+        new SuccessResponse({
+            metadata: await AccessService.login(req.body)
+        }).send(res)
     }
     signUp = async (req:Request, res: Response, next: NextFunction) => {
         new CREATED({

@@ -1,14 +1,5 @@
 import { Response } from "express";
-
-const StatusCode = {
-    OK: 200,
-    CREATED: 201
-}
-
-const ReasonStatusCode = {
-    OK: "Success",
-    CREATED: "Created"
-}
+import {StatusCodes, ReasonPhrases} from '../utils/httpStatusCode'
 
 interface SuccessResponseOptions {
     message?: string;
@@ -22,7 +13,7 @@ class SuccessResponse {
     status: number;
     metadata: Record<string, any>;
     options: any;
-    constructor({message, statusCode = StatusCode.OK, reasonStatusCode = ReasonStatusCode.OK , metadata = {}}: SuccessResponseOptions) {
+    constructor({message, statusCode = StatusCodes.OK, reasonStatusCode = ReasonPhrases.OK , metadata = {}}: SuccessResponseOptions) {
         this.message = !message ? reasonStatusCode : message
         this.status = statusCode
         this.metadata = metadata
@@ -40,7 +31,7 @@ class OK extends SuccessResponse {
 }
 
 class CREATED extends SuccessResponse {
-    constructor({ options={}, message, statusCode = StatusCode.CREATED, reasonStatusCode = ReasonStatusCode.CREATED, metadata }: SuccessResponseOptions) {
+    constructor({ options={}, message, statusCode = StatusCodes.CREATED, reasonStatusCode = ReasonPhrases.CREATED, metadata }: SuccessResponseOptions) {
         super({ message, statusCode, reasonStatusCode, metadata });
         this.options = options
     }

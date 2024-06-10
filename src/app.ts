@@ -3,6 +3,7 @@ import morgan from 'morgan'
 import helmet from 'helmet';
 import compression from 'compression';
 import router from './routes/index'
+import {StatusCodes, ReasonPhrases} from '../src/utils/httpStatusCode'
 require('dotenv').config()
 const app = express();
 const logger = morgan('dev')
@@ -21,16 +22,16 @@ app.use('/', router)
 
 //handle error
 app.use((req: Request, res: Response, next: NextFunction) => {
-    const error: Error & { status?: number } = new Error('Not found');
-    error.status = 404
+    const error: Error & { status?: number } = new Error(ReasonPhrases.NOT_FOUND);
+    error.status = StatusCodes.NOT_FOUND
     next(error)
 })
 app.use((error: Error & { status?: number }, req: Request, res: Response, next: NextFunction) => {
-    const statusCode = error.status || 500
+    const statusCode = error.status || StatusCodes.INTERNAL_SERVER_ERROR
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
-        message: error.message || "Internal Server Error"
+        message: error.message || ReasonPhrases.INTERNAL_SERVER_ERROR
     })
 })
 export default app;

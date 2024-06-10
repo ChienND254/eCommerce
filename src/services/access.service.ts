@@ -6,7 +6,8 @@ import { createTokenPair } from '../auth/authUtils';
 import getInfoData from '../utils';
 import { AuthFailureError, BadRequestError } from '../core/error.response';
 import { findByEmail } from './shop.service';
-import { ObjectId } from 'mongoose';
+import { ObjectId} from 'mongoose';
+import { IKeyToken } from '../models/keytoken.model';
 
 const RoleShop = {
     SHOP: 'SHOP',
@@ -24,9 +25,13 @@ interface ServiceResponse {
 }
 
 class AccessService {
+    static logout = async(keyStore:IKeyToken) => {
+        const delKey = await KeyTokenService.removeKeyById(keyStore._id as ObjectId)
+        return delKey
+    }
     static login = async ({ email, password, refreshToken = null }: { email: string, password: string, refreshToken: string | null }): Promise<ServiceResponse> => {
+        
         const foundShop: IShop | null = await findByEmail({ email });
-        console.log(foundShop);
         
         if (!foundShop) throw new BadRequestError('Shop not registered');
 
@@ -57,9 +62,7 @@ class AccessService {
         }
 
         const holderShop = await ShopModel.findOne({ email }).lean();
-        if (holderShop) {
-            throw new BadRequestError('Error: Shop already registered');
-        }
+        if (holderShop) throw new BadRequestError('Error: Shop already registered');
 
         const passwordHash: string = await bcrypt.hash(password, 10);
         const newShop = await ShopModel.create({

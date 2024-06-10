@@ -35,4 +35,4 @@ const keyTokenSchema:Schema = new Schema({
     collection: COLLECTION_NAME,
 });
 const KeyTokenModel = model<IKeyToken>(DOCUMENT_NAME, keyTokenSchema);
-export default KeyTokenModel;
+export {KeyTokenModel, IKeyToken};

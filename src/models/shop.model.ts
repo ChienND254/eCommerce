@@ -1,6 +1,7 @@
-import {model, Schema, Document} from 'mongoose';
+import {model, Schema, Document, ObjectId} from 'mongoose';
 
 interface IShop extends Document {
+    _id: ObjectId;
     name: string;
     email: string;
     password: string;

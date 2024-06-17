@@ -4,21 +4,24 @@ import { AuthFailureError, NotFoundError } from '../core/error.response';
 import KeyTokenService from '../services/keyToken.service';
 import { NextFunction, Request, Response } from 'express';
 import { IKeyToken} from '../models/keytoken.model';
-import { Schema,Types } from 'mongoose';
+import { IShop } from '../models/shop.model';
 
 interface TokenPayload {
     userId: any;
-    email: String
+    email: string
 }
 declare module 'express' {
     interface Request {
-        keyStore?: IKeyToken; // Define your custom property here
+        user?: TokenPayload;
+        refreshToken?: string;
+        keyStore?: IKeyToken;
     }
 }
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
-    AUTHORIZATION: 'authorization'
+    AUTHORIZATION: 'authorization',
+    REFRESHTOKEN: 'x-rtoken-id'
 }
 const createTokenPair = async (
     payload: TokenPayload,
@@ -53,17 +56,31 @@ const createTokenPair = async (
 };
 const authentication = asyncHandler(async(req: Request, res: Response, next: NextFunction) => {
     const userId = req.headers[HEADER.CLIENT_ID] as string
-    if (!userId) {
-        throw new AuthFailureError('Invalid request')
-    }
+    const refreshToken = req.headers[HEADER.REFRESHTOKEN] as string
+    //check header missing user
+    if (!userId) throw new AuthFailureError('Invalid request');
 
     const keyStore = await KeyTokenService.findByUserId(userId)
-    if (!keyStore) throw new NotFoundError('Not KeyStore')
-
+    // check get AccessToken
+    if (!keyStore) throw new NotFoundError('Not KeyStore');
+    
+    if (refreshToken) {
+        try {
+            const decodeUser = JWT.verify(refreshToken, keyStore.privateKey) as JwtPayload
+            if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid User')
+            req.keyStore = keyStore
+            req.user = decodeUser as TokenPayload
+            req.refreshToken = refreshToken 
+            return next()
+        } catch (error) {
+            throw error
+        }
+    }
     const accessToken = req.headers[HEADER.AUTHORIZATION] as string
-
+    // check accessToken clien vs db
     if (!accessToken) throw new AuthFailureError('Invalid request')
-
+    
+    // ok => next()
     try {
         const decodeUser = JWT.verify(accessToken, keyStore.publicKey) as JwtPayload
         if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid User')
@@ -73,4 +90,8 @@ const authentication = asyncHandler(async(req: Request, res: Response, next: Nex
         throw error
     }
 })
-export { createTokenPair, authentication };
+
+// const verifyJWT = async (token:string , keySecret: string) => {
+//     return await JWT.verify(token, keySecret)
+// }
+export { createTokenPair, authentication};

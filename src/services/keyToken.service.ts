@@ -1,5 +1,6 @@
-import {KeyTokenModel} from '../models/keytoken.model';
+import {IKeyToken, KeyTokenModel} from '../models/keytoken.model';
 import { ObjectId, Types } from 'mongoose';
+
 interface CreateKeyTokenParams {
     userId: ObjectId;
     publicKey: string;
@@ -8,10 +9,13 @@ interface CreateKeyTokenParams {
 }
 
 class KeyTokenService {
+    // Method to create or update a key token
     static createKeyToken = async ({ userId, publicKey, privateKey, refreshToken }: CreateKeyTokenParams): Promise<string | null> => {
         try {
-
+            // Define the filter to find the key token by user ID
             const filter = { user: userId };
+
+            // Define the update object with new values
             const update = {
                 publicKey,
                 privateKey,
@@ -19,10 +23,13 @@ class KeyTokenService {
                 refreshToken
             };
             
+            // Define options for findOneAndUpdate operation
             const options = { upsert: true, new: true };
 
+            // Find and update the key token
             const tokens = await KeyTokenModel.findOneAndUpdate(filter, update, options);
 
+            // Return the publicKey if tokens exist, otherwise null
             return tokens ? tokens.publicKey : null;
         } catch (error) {
             console.error('Error creating key token:', error);
@@ -30,12 +37,46 @@ class KeyTokenService {
         }
     }
     
-    static findByUserId = async (userId: string) => {
-        return await KeyTokenModel.findOne({user: new Types.ObjectId(userId)}, {}).lean()        
+    // Method to find a key token by user ID
+    static findByUserId = async (userId: string): Promise<IKeyToken | null> => {
+        return await KeyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean();
     }
 
-    static removeKeyById = async (id: ObjectId) => {
-        return await KeyTokenModel.deleteOne(id);
+    // Method to remove a key token by ID
+    static removeKeyById = async (id: ObjectId): Promise<any> => {
+        return await KeyTokenModel.deleteOne({ _id: id });
+    }
+
+    // Method to find a key token by refresh token used
+    static findByRefreshTokenUsed = async (refreshToken: string): Promise<IKeyToken | null> => {
+        return await KeyTokenModel.findOne({ refreshTokensUsed: refreshToken }).lean();
+    }
+
+    // Method to find a key token by refresh token
+    static findByRefreshToken = async (refreshToken: string): Promise<any> => {
+        return await KeyTokenModel.findOne({ refreshToken: refreshToken });
+    }
+
+    // Method to update refresh token
+    static updateRefreshToken = async (newRefreshToken: string, usedRefreshToken: string): Promise<IKeyToken | null> => {
+        const updateQuery: any = {
+            $set: { refreshToken: newRefreshToken }
+        };
+
+        // Add to set only if usedRefreshToken is not empty
+        if (usedRefreshToken !== '') {
+            updateQuery.$addToSet = { refreshTokensUsed: usedRefreshToken };
+        }
+
+        return await KeyTokenModel.findOneAndUpdate(
+            { refreshToken: usedRefreshToken },
+            updateQuery,
+            { new: true }
+        ).lean();
+    }
+    // Method to delete a key token by user ID
+    static deleteKeyById = async (userId: ObjectId): Promise<any> => {
+        return await KeyTokenModel.deleteOne({ user: userId });
     }
 }
 

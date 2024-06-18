@@ -4,10 +4,10 @@ import { AuthFailureError, NotFoundError } from '../core/error.response';
 import KeyTokenService from '../services/keyToken.service';
 import { NextFunction, Request, Response } from 'express';
 import { IKeyToken} from '../models/keytoken.model';
-import { IShop } from '../models/shop.model';
+import { ObjectId } from 'mongoose';
 
 interface TokenPayload {
-    userId: any;
+    userId: ObjectId;
     email: string
 }
 declare module 'express' {
@@ -82,9 +82,10 @@ const authentication = asyncHandler(async(req: Request, res: Response, next: Nex
     
     // ok => next()
     try {
-        const decodeUser = JWT.verify(accessToken, keyStore.publicKey) as JwtPayload
+        const decodeUser = JWT.verify(accessToken, keyStore.publicKey) as JwtPayload        
         if (userId !== decodeUser.userId) throw new AuthFailureError('Invalid User')
         req.keyStore = keyStore
+        req.user = decodeUser as TokenPayload
         return next()
     } catch (error) {
         throw error

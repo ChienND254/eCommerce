@@ -4,12 +4,25 @@ import { CREATED, SuccessResponse } from '../core/success.response';
 import { AuthFailureError } from '../core/error.response';
 
 class AccessController {
-    login = async (req: Request, res: Response, next: NextFunction) => {        
+    /**
+     * @desc Handle user login
+     * @param {string} email
+     * @param {string} password
+     * @return {JSON} 
+     */
+    login = async (req: Request, res: Response, next: NextFunction) => {
         new SuccessResponse({
             metadata: await AccessService.login(req.body)
         }).send(res)
     }
-    signUp = async (req:Request, res: Response, next: NextFunction) => {
+    /**
+     * @desc Handle user sign-up
+     * @param {string} name
+     * @param {string} email
+     * @param {string} password
+     * @return {JSON} 
+     */
+    signUp = async (req: Request, res: Response, next: NextFunction) => {
         new CREATED({
             message: 'Registered OK',
             metadata: await AccessService.signUp(req.body) || null,
@@ -18,6 +31,11 @@ class AccessController {
             }
         }).send(res)
     }
+
+    /**
+     * @desc Handle user logout
+     * @return {JSON} 
+     */
     logout = async (req: Request, res: Response, next: NextFunction) => {
         if (!req.keyStore) {
             return next(new Error('KeyStore not found')); // or handle the error appropriately
@@ -27,7 +45,13 @@ class AccessController {
             metadata: await AccessService.logout(req.keyStore)
         }).send(res)
     }
-    handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {     
+
+    /**
+     * 
+     * @param {string} refreshToken
+     * @returns  {JSON}
+     */
+    handleRefreshToken = async (req: Request, res: Response, next: NextFunction) => {
         if (!req.refreshToken || !req.user || !req.keyStore) {
             return next(new AuthFailureError('Invalid request'));
         }

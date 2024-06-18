@@ -13,13 +13,13 @@ interface CustomRequest extends Request {
 const apiKey = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     const key: string = req.headers[HEADER.API_KEY] as string;
     if (!key) {
-        return next(new BadRequestError('Forbidden Error', 403))
+        return next(new BadRequestError('Forbidden Error'))
     }
 
     //check object
     const objKey: IApiKey | null = await findByID(key)
     if (!objKey) {
-        return next(new BadRequestError('Forbidden Error: Invalid API key', 403))
+        return next(new BadRequestError('Forbidden Error: Invalid API key'))
     }    
     req.objKey = objKey;
     next()

@@ -2,6 +2,7 @@ import { ObjectId } from "mongoose";
 import { IProduct } from "../interface/product";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
+import { findAllDraftsForShop } from "../models/repositories/product.repo";
 
 class ProductFactory {
 
@@ -17,6 +18,13 @@ class ProductFactory {
         const productInstance = new productClass(data);
         return await productInstance.createProduct();
     }
+
+    static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}:{product_shop: ObjectId, limit?: number, skip?: number}) : Promise<IProduct[]> {
+        if (!product_shop) throw new BadRequestError('Invalid Request')
+        const query = {product_shop, isDraft: true}
+        
+        return await findAllDraftsForShop({query, limit, skip})
+    }
 }
 
 class Product {
@@ -28,7 +36,7 @@ class Product {
     product_type: string;
     product_shop: ObjectId;
     product_attributes: any;
-
+    
     constructor({
         product_name,
         product_thumb,
@@ -37,7 +45,7 @@ class Product {
         product_quantity,
         product_type,
         product_shop,
-        product_attributes
+        product_attributes,
     }: IProduct) {
         this.product_name = product_name;
         this.product_thumb = product_thumb;

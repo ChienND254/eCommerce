@@ -29,6 +29,7 @@ const productSchema: Schema = new Schema({
     collection: COLLECTION_NAME
 });
 
+productSchema.index({product_name: 'text', product_description: 'text'})
 //document middleware: run before .save and .create ...
 productSchema.pre<IProduct>('save', function(next) {
     this.product_slug = slugify(this.product_name, {lower: true})

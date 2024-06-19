@@ -2,7 +2,13 @@ import { ObjectId } from "mongoose";
 import { IProduct } from "../interface/product";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
-import { findAllDraftsForShop } from "../models/repositories/product.repo";
+import { 
+    findAllDraftsForShop, 
+    publishProductByShop,
+    findAllPublishForShop,
+    unPublishProductByShop,
+    searchProductByUser,
+} from "../models/repositories/product.repo";
 
 class ProductFactory {
 
@@ -11,6 +17,7 @@ class ProductFactory {
     static registerProductType (type:string,classRef: any) {
         ProductFactory.productRegistry[type] = classRef
     }
+
     static async createProduct(type: string, data: IProduct): Promise<IProduct> {
         const productClass = ProductFactory.productRegistry[type]
         if (!productClass) throw new BadRequestError(`Invalid product type ${type}`);
@@ -24,6 +31,25 @@ class ProductFactory {
         const query = {product_shop, isDraft: true}
         
         return await findAllDraftsForShop({query, limit, skip})
+    }
+
+    static async findAllPublishForShop({product_shop, limit = 50, skip = 0}:{product_shop: ObjectId, limit?: number, skip?: number}) : Promise<IProduct[]> {
+        if (!product_shop) throw new BadRequestError('Invalid Request')
+        const query = {product_shop, isPublished: true}
+        
+        return await findAllPublishForShop({query, limit, skip})
+    }
+
+    static async publishProductByShop({product_shop, product_id}:{product_shop: ObjectId, product_id: ObjectId}) {
+        return await publishProductByShop({product_shop, product_id})
+    }
+
+    static async unPublishProductByShop({product_shop, product_id}:{product_shop: ObjectId, product_id: ObjectId}): Promise<number> {
+        return await unPublishProductByShop({product_shop, product_id})
+    }
+
+    static async getListSearchProduct(keySearch: string) {
+        return await searchProductByUser(keySearch)
     }
 }
 

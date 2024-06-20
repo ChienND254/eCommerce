@@ -84,10 +84,22 @@ class ProductController {
      * @return {JSON} 
      */
     getListSearchProduct = async (req: Request, res: Response) => {
-        const {keySearch} = req.params 
+        const { keySearch } = req.params
         new SuccessResponse({
             message: 'getListSearchProduct success!',
             metadata: await ProductService.getListSearchProduct(keySearch as string)
+        }).send(res)
+    }
+
+    /**
+     * @desc find all product
+     * @param {string} keySearch
+     * @return {JSON} 
+     */
+    findAllProduct = async (req: Request, res: Response) => {
+        new SuccessResponse({
+            message: 'Get all product success!',
+            metadata: await ProductService.findAllProducts(req.params)
         }).send(res)
     }
 }

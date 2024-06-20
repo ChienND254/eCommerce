@@ -8,6 +8,7 @@ import {
     findAllPublishForShop,
     unPublishProductByShop,
     searchProductByUser,
+    findAllProducts,
 } from "../models/repositories/product.repo";
 
 class ProductFactory {
@@ -19,6 +20,14 @@ class ProductFactory {
     }
 
     static async createProduct(type: string, data: IProduct): Promise<IProduct> {
+        const productClass = ProductFactory.productRegistry[type]
+        if (!productClass) throw new BadRequestError(`Invalid product type ${type}`);
+
+        const productInstance = new productClass(data);
+        return await productInstance.createProduct();
+    }
+
+    static async updateProduct(type: string, data: IProduct): Promise<IProduct> {
         const productClass = ProductFactory.productRegistry[type]
         if (!productClass) throw new BadRequestError(`Invalid product type ${type}`);
 
@@ -49,6 +58,14 @@ class ProductFactory {
     }
 
     static async getListSearchProduct(keySearch: string) {
+        return await searchProductByUser(keySearch)
+    }
+
+    static async findAllProducts({limit = 50, sort = 'ctime', page = 1, filter = {isPublished: true}}) {
+        return await findAllProducts({limit, sort, page , filter, select: ['product_name', 'product_price', 'product_thumb']})
+    }
+
+    static async findProduct(keySearch: string) {
         return await searchProductByUser(keySearch)
     }
 }

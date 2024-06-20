@@ -47,7 +47,7 @@ class AccessController {
     }
 
     /**
-     * 
+     * @desc Handle refresh token 
      * @param {string} refreshToken
      * @returns  {JSON}
      */

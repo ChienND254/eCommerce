@@ -5,6 +5,7 @@ import { authentication } from '../../auth/authUtils';
 
 const router = express.Router()
 router.get('/search/:keySearch', asyncHandler(productController.getListSearchProduct))
+router.get('', asyncHandler(productController.findAllProduct))
 router.use(authentication)
 
 router.post('', asyncHandler(productController.createProduct))

@@ -1,7 +1,8 @@
 import { IProduct } from "../../interface/product";
-import { productModel, electronicsModel, clothingModel, furnitureModel } from "../product.model";
+import { productModel } from "../product.model";
 import Query from "../../interface/query";
-import { ObjectId } from "mongoose";
+import { ObjectId, SortOrder } from "mongoose";
+import { getSelectData } from "../../utils";
 
 interface QueryParams {
     query: Query;
@@ -9,10 +10,6 @@ interface QueryParams {
     skip: number;
 }
 
-interface PublishProductByShopParams {
-    product_shop: ObjectId;
-    product_id: ObjectId;
-}
 const findAllDraftsForShop = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
     return await queryProduct({ query, limit, skip })
 
@@ -20,24 +17,6 @@ const findAllDraftsForShop = async ({ query, limit, skip }: QueryParams): Promis
 
 const findAllPublishForShop = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
     return await queryProduct({ query, limit, skip })
-}
-
-const publishProductByShop = async ({ product_shop, product_id }: PublishProductByShopParams) => {
-    const result = await productModel.updateOne(
-        { _id: product_id, product_shop: product_shop },
-        { $set: { isDraft: false, isPublished: true } }
-    );
-
-    return result.modifiedCount;
-}
-
-const unPublishProductByShop = async ({ product_shop, product_id }: PublishProductByShopParams) => {
-    const result = await productModel.updateOne(
-        { _id: product_id, product_shop: product_shop },
-        { $set: { isDraft: true, isPublished: false } }
-    );
-
-    return result.modifiedCount;
 }
 
 const queryProduct = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
@@ -50,20 +29,51 @@ const queryProduct = async ({ query, limit, skip }: QueryParams): Promise<IProdu
         .exec()
 }
 
-const searchProductByUser = async (keySearch: string ): Promise<IProduct[]> => {
+const publishProductByShop = async ({ product_shop, product_id }: {product_shop: ObjectId, product_id: ObjectId}) => {
+    const result = await productModel.updateOne(
+        { _id: product_id, product_shop: product_shop },
+        { $set: { isDraft: false, isPublished: true } }
+    );
+
+    return result.modifiedCount;
+}
+
+const unPublishProductByShop = async ({ product_shop, product_id }: {product_shop: ObjectId, product_id: ObjectId}) => {
+    const result = await productModel.updateOne(
+        { _id: product_id, product_shop: product_shop },
+        { $set: { isDraft: true, isPublished: false } }
+    );
+
+    return result.modifiedCount;
+}
+
+const searchProductByUser = async (keySearch: string): Promise<IProduct[]> => {
     const regexSearch: RegExp = new RegExp(keySearch);
     const results = await productModel.find({
         isPublished: true,
-        $text: { $search: regexSearch  as unknown as string}
+        $text: { $search: regexSearch as unknown as string }
     }, { score: { $meta: 'textScore' } })
         .sort({ score: { $meta: 'textScore' } })
         .lean()
     return results;
 }
+
+const findAllProducts = async ({ limit, sort, page, filter, select }: { limit: number, sort: string, page: number, filter: any, select: string[] }): Promise<IProduct[]> => {
+    const skip: number = (page - 1) * limit
+    const sortBy: { [key: string]: SortOrder } = sort === 'ctime' ? { _id: -1 } : { _id: 1 }
+    const products = await productModel.find(filter)
+        .sort(sortBy)
+        .skip(skip)
+        .select(getSelectData(select))
+        .lean()
+    return products
+}
+
 export {
     findAllDraftsForShop,
     findAllPublishForShop,
     publishProductByShop,
     unPublishProductByShop,
     searchProductByUser,
+    findAllProducts,
 }

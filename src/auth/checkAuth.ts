@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import findByID from '../services/apiKey.service';
-import { IApiKey } from '../models/apikey.model';
+import { IApiKey } from '../interface/apikey';
 import { BadRequestError } from '../core/error.response';
+
 const HEADER = {
     API_KEY: 'x-api-key',
     AUTHORIZATION: 'authorization'
@@ -10,6 +11,7 @@ const HEADER = {
 interface CustomRequest extends Request {
     objKey?: IApiKey;
 }
+
 const apiKey = async (req: CustomRequest, res: Response, next: NextFunction): Promise<void> => {
     const key: string = req.headers[HEADER.API_KEY] as string;
     if (!key) {
@@ -37,6 +39,5 @@ const permission = (permission: string) => {
         next()
     }
 }
-
 
 export { apiKey, permission};

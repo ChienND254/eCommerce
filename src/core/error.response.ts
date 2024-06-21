@@ -40,6 +40,7 @@ class ForbiddenError extends ErrorResponse {
         super(message, statusCode)
     }
 }
+
 export {
     ConflictRequestError, 
     BadRequestError,

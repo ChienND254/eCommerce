@@ -1,6 +1,7 @@
 import { model, Schema } from 'mongoose';
 import { IClothing, IElectronics, IProduct, IFurniture } from '../interface/product';
 import slugify from 'slugify';
+
 const DOCUMENT_NAME: string = 'Product';
 const COLLECTION_NAME: string = 'Products';
 
@@ -35,6 +36,7 @@ productSchema.pre<IProduct>('save', function(next) {
     this.product_slug = slugify(this.product_name, {lower: true})
     next();
 })
+
 const clothingSchema: Schema = new Schema({
     brand: { type: String, require: true },
     size: String,
@@ -64,6 +66,7 @@ const furnitureSchema: Schema = new Schema({
     collection: 'Furnitures',
     timestamps: true,
 })
+
 const productModel = model<IProduct>(DOCUMENT_NAME, productSchema);
 const electronicsModel = model<IElectronics>('Electronics', electronicsSchema);
 const clothingModel = model<IClothing>('Clothing', clothingSchema);

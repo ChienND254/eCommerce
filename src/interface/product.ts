@@ -1,4 +1,5 @@
 import { ObjectId, Document } from "mongoose";
+
 interface IProduct extends Document {
     product_name: string;
     product_thumb: string;
@@ -10,7 +11,7 @@ interface IProduct extends Document {
     product_shop: ObjectId;
     product_attributes: any;
     product_ratingsAverage?: number;
-    product_variations?: any[]; 
+    product_variations?: any[];
     isDraft?: boolean;
     isPublished?: boolean;
 }
@@ -21,7 +22,8 @@ interface IElectronics extends Document {
     color: string;
     product_shop: ObjectId;
 }
-interface IClothing extends Document{
+
+interface IClothing extends Document {
     brand: string;
     size: string;
     material: string;
@@ -34,4 +36,5 @@ interface IFurniture extends Document {
     material: string;
     product_shop: ObjectId;
 }
-export {IProduct, IElectronics, IClothing, IFurniture}
+
+export { IProduct, IElectronics, IClothing, IFurniture }

@@ -8,6 +8,7 @@ interface SuccessResponseOptions {
     metadata?: any;
     options?: any;
 }
+
 class SuccessResponse {
     message: string;
     status: number;

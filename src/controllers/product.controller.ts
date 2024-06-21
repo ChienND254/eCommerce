@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express'
 import ProductService from '../services/product.service';
 import { SuccessResponse } from '../core/success.response';
 import { ObjectId } from 'mongoose';
-import { IProduct } from '../interface/product';
 
 class ProductController {
     /**

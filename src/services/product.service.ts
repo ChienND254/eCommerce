@@ -1,5 +1,5 @@
-import { Document, ObjectId } from "mongoose";
-import { IClothing, IProduct } from "../interface/product";
+import { ObjectId } from "mongoose";
+import { IProduct } from "../interface/product";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
 import { 
@@ -174,4 +174,5 @@ class Furniture extends Product {
 ProductFactory.registerProductType('Electronics', Electronics)
 ProductFactory.registerProductType('Clothing', Clothing)
 ProductFactory.registerProductType('Furniture', Furniture)
+
 export default ProductFactory;

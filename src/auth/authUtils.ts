@@ -3,13 +3,14 @@ import { asyncHandler } from '../helpers/asyncHandle';
 import { AuthFailureError, NotFoundError } from '../core/error.response';
 import KeyTokenService from '../services/keyToken.service';
 import { NextFunction, Request, Response } from 'express';
-import { IKeyToken} from '../models/keytoken.model';
 import { ObjectId } from 'mongoose';
+import { IKeyToken } from '../interface/keytoken';
 
 interface TokenPayload {
     userId: ObjectId;
     email: string
 }
+
 declare module 'express' {
     interface Request {
         user?: TokenPayload;
@@ -17,12 +18,14 @@ declare module 'express' {
         keyStore?: IKeyToken;
     }
 }
+
 const HEADER = {
     API_KEY: 'x-api-key',
     CLIENT_ID: 'x-client-id',
     AUTHORIZATION: 'authorization',
     REFRESHTOKEN: 'x-rtoken-id'
 }
+
 const createTokenPair = async (
     payload: TokenPayload,
     publicKey: string,
@@ -54,6 +57,7 @@ const createTokenPair = async (
         throw error;
     }
 };
+
 const authentication = asyncHandler(async(req: Request, res: Response, next: NextFunction) => {
     const userId = req.headers[HEADER.CLIENT_ID] as string
     const refreshToken = req.headers[HEADER.REFRESHTOKEN] as string

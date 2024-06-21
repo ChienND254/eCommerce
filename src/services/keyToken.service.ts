@@ -1,6 +1,6 @@
-import {IKeyToken, KeyTokenModel} from '../models/keytoken.model';
+import { KeyTokenModel } from '../models/keytoken.model';
 import { ObjectId, Types } from 'mongoose';
-
+import { IKeyToken } from '../interface/keytoken';
 interface CreateKeyTokenParams {
     userId: ObjectId;
     publicKey: string;
@@ -22,7 +22,7 @@ class KeyTokenService {
                 refreshTokensUsed: [],
                 refreshToken
             };
-            
+
             // Define options for findOneAndUpdate operation
             const options = { upsert: true, new: true };
 
@@ -36,7 +36,7 @@ class KeyTokenService {
             return null;
         }
     }
-    
+
     // Method to find a key token by user ID
     static findByUserId = async (userId: string): Promise<IKeyToken | null> => {
         return await KeyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean();

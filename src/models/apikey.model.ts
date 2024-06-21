@@ -1,32 +1,30 @@
-import {model, Schema, Document} from 'mongoose';
+import { model, Schema } from 'mongoose';
+import { IApiKey } from '../interface/apikey';
 
-interface IApiKey extends Document {
-    key: string; 
-    status: boolean;
-    permissions: string[];
-}
+const DOCUMENT_NAME: string = 'ApiKey'
+const COLLECTION_NAME: string = 'ApiKeys'
 
-const DOCUMENT_NAME:string = 'ApiKey'
-const COLLECTION_NAME: string = 'ApiKeys' 
 // Declare the Schema of the Mongo model
-const apiTokenSchema:Schema = new Schema({
-    key:{
+const apiTokenSchema: Schema = new Schema({
+    key: {
         type: String,
         required: true,
         unique: true
     },
-    status:{
+    status: {
         type: Boolean,
-        default:true,
+        default: true,
     },
-    permissions:{
+    permissions: {
         type: [String],
-        required:true,
-        enum: ['0000','1111', '2222']
+        required: true,
+        enum: ['0000', '1111', '2222']
     },
 }, {
     timestamps: true,
     collection: COLLECTION_NAME
 });
+
 const ApiKeyModel = model<IApiKey>(DOCUMENT_NAME, apiTokenSchema);
-export {ApiKeyModel, IApiKey};
+
+export { ApiKeyModel };

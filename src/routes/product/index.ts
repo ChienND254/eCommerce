@@ -4,6 +4,7 @@ import { asyncHandler } from '../../helpers/asyncHandle';
 import { authentication } from '../../auth/authUtils';
 
 const router = express.Router()
+
 router.get('/search/:keySearch', asyncHandler(productController.getListSearchProduct))
 router.get('', asyncHandler(productController.findAllProducts))
 router.get('/:product_id', asyncHandler(productController.findProduct))
@@ -17,4 +18,5 @@ router.post('/unpublish/:id', asyncHandler(productController.unPublishProductByS
 //query
 router.get('/drafts/all', asyncHandler(productController.getAllDraftsForShop))
 router.get('/published/all', asyncHandler(productController.getAllPublishForShop))
+
 export default router

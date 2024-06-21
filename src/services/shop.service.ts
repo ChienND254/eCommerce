@@ -1,4 +1,5 @@
-import { ShopModel, IShop } from "../models/shop.model";
+import { ShopModel } from "../models/shop.model";
+import { IShop } from "../interface/shop";
 
 interface FindByEmailParams {
     email: string;

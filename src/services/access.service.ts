@@ -1,4 +1,6 @@
-import { ShopModel, IShop } from '../models/shop.model';
+import { ShopModel} from '../models/shop.model';
+import { IKeyToken } from '../interface/keytoken';
+import { IShop } from '../interface/shop';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import KeyTokenService from './keyToken.service';
@@ -7,7 +9,6 @@ import {getInfoData} from '../utils';
 import { AuthFailureError, BadRequestError, ForbiddenError } from '../core/error.response';
 import { findByEmail } from './shop.service';
 import { ObjectId } from 'mongoose';
-import { IKeyToken } from '../models/keytoken.model';
 import { RoleShop } from '../utils/roleShop';
 
 interface ServiceResponse {

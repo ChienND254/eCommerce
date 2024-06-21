@@ -15,6 +15,7 @@ interface UpdateProductParams<T> {
     model: Model<any>;
     isNew?: boolean;
 }
+
 const findAllDraftsForShop = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
     return await queryProduct({ query, limit, skip })
 }
@@ -83,6 +84,7 @@ const updateProductById = async <T>({ productId, bodyUpdate, model, isNew = true
         new: isNew
     })
 }
+
 export {
     findAllDraftsForShop,
     findAllPublishForShop,

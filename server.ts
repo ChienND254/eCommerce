@@ -1,5 +1,6 @@
 import app from './src/app'
 import config from './src/configs/config.mongodb'
+
 const PORT = config.app.port
 const server = app.listen(PORT, () => {
     console.log(`The application is listening on port ${PORT}!`);

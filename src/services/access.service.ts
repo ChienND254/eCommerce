@@ -1,4 +1,4 @@
-import { ShopModel} from '../models/shop.model';
+import { shopModel} from '../models/shop.model';
 import { IKeyToken } from '../interface/keytoken';
 import { IShop } from '../interface/shop';
 import bcrypt from 'bcrypt';
@@ -75,14 +75,14 @@ class AccessService {
         }
 
         // Checking if shop with email already exists
-        const holderShop = await ShopModel.findOne({ email }).lean();
+        const holderShop = await shopModel.findOne({ email }).lean();
         if (holderShop) throw new BadRequestError('Error: Shop already registered');
 
         // Hashing password using bcrypt
         const passwordHash: string = await bcrypt.hash(password, 10);
 
         // Creating new shop record
-        const newShop = await ShopModel.create({
+        const newShop = await shopModel.create({
             name,
             email,
             password: passwordHash,

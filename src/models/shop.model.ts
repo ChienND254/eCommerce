@@ -17,6 +17,6 @@ const shopSchema: Schema = new Schema({
     collection: COLLECTION_NAME
 });
 
-const ShopModel = model<IShop>(DOCUMENT_NAME, shopSchema);
+const shopModel = model<IShop>(DOCUMENT_NAME, shopSchema);
 
-export { ShopModel };
+export { shopModel };

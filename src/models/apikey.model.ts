@@ -25,6 +25,6 @@ const apiTokenSchema: Schema = new Schema({
     collection: COLLECTION_NAME
 });
 
-const ApiKeyModel = model<IApiKey>(DOCUMENT_NAME, apiTokenSchema);
+const apiKeyModel = model<IApiKey>(DOCUMENT_NAME, apiTokenSchema);
 
-export { ApiKeyModel };
+export { apiKeyModel };

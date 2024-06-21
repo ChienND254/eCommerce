@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import findByID from '../services/apiKey.service';
+import { findByID } from '../services/apiKey.service';
 import { IApiKey } from '../interface/apikey';
 import { BadRequestError } from '../core/error.response';
 

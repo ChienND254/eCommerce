@@ -13,6 +13,7 @@ import {
     updateProductById,
 } from "../models/repositories/product.repo";
 import { removeUndefinedObject, updateNestedObjectParser } from "../utils";
+import { insertInventory } from "../models/repositories/inventory.repo";
 
 class ProductFactory {
 
@@ -106,7 +107,17 @@ class Product {
 
     //create new product
     async createProduct(productId: ObjectId): Promise<IProduct> {
-        return await productModel.create({ ...this, _id: productId })
+        const newProduct: IProduct = await productModel.create({ ...this, _id: productId });
+        if (!newProduct) {
+            throw new BadRequestError('Failed to create product');
+        }
+        await insertInventory({
+            productId: newProduct._id as ObjectId,
+            shopId: this.product_shop,
+            stock: this.product_quantity
+        });
+
+        return newProduct
     }
 
     //update product

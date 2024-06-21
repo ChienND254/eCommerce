@@ -1,6 +1,7 @@
-import { KeyTokenModel } from '../models/keytoken.model';
+import { keyTokenModel } from '../models/keytoken.model';
 import { ObjectId, Types } from 'mongoose';
 import { IKeyToken } from '../interface/keytoken';
+
 interface CreateKeyTokenParams {
     userId: ObjectId;
     publicKey: string;
@@ -27,7 +28,7 @@ class KeyTokenService {
             const options = { upsert: true, new: true };
 
             // Find and update the key token
-            const tokens = await KeyTokenModel.findOneAndUpdate(filter, update, options);
+            const tokens = await keyTokenModel.findOneAndUpdate(filter, update, options);
 
             // Return the publicKey if tokens exist, otherwise null
             return tokens ? tokens.publicKey : null;
@@ -39,22 +40,22 @@ class KeyTokenService {
 
     // Method to find a key token by user ID
     static findByUserId = async (userId: string): Promise<IKeyToken | null> => {
-        return await KeyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean();
+        return await keyTokenModel.findOne({ user: new Types.ObjectId(userId) }).lean();
     }
 
     // Method to remove a key token by ID
     static removeKeyById = async (id: ObjectId): Promise<any> => {
-        return await KeyTokenModel.deleteOne({ _id: id });
+        return await keyTokenModel.deleteOne({ _id: id });
     }
 
     // Method to find a key token by refresh token used
     static findByRefreshTokenUsed = async (refreshToken: string): Promise<IKeyToken | null> => {
-        return await KeyTokenModel.findOne({ refreshTokensUsed: refreshToken }).lean();
+        return await keyTokenModel.findOne({ refreshTokensUsed: refreshToken }).lean();
     }
 
     // Method to find a key token by refresh token
     static findByRefreshToken = async (refreshToken: string): Promise<any> => {
-        return await KeyTokenModel.findOne({ refreshToken: refreshToken });
+        return await keyTokenModel.findOne({ refreshToken: refreshToken });
     }
 
     // Method to update refresh token
@@ -68,15 +69,16 @@ class KeyTokenService {
             updateQuery.$addToSet = { refreshTokensUsed: usedRefreshToken };
         }
 
-        return await KeyTokenModel.findOneAndUpdate(
+        return await keyTokenModel.findOneAndUpdate(
             { refreshToken: usedRefreshToken },
             updateQuery,
             { new: true }
         ).lean();
     }
+    
     // Method to delete a key token by user ID
     static deleteKeyById = async (userId: ObjectId): Promise<any> => {
-        return await KeyTokenModel.deleteOne({ user: userId });
+        return await keyTokenModel.deleteOne({ user: userId });
     }
 }
 

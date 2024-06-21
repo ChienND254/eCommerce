@@ -22,7 +22,6 @@ interface IElectronics extends Document {
     color: string;
     product_shop: ObjectId;
 }
-
 interface IClothing extends Document {
     brand: string;
     size: string;

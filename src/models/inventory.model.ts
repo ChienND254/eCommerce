@@ -6,11 +6,11 @@ const COLLECTION_NAME: string = 'Inventories'
 
 // Declare the Schema of the Mongo model
 const inventorySchema: Schema = new Schema({
-    inven_product: { type: Schema.Types.ObjectId, ref: 'Product' },
-    inven_location: { type: String, default: 'unknown' },
+    inven_productId: { type: Schema.Types.ObjectId, ref: 'Product' },
+    inven_shopId: { type: Schema.Types.ObjectId, ref: 'Shop' },
     inven_stock: { type: Number, require: true },
-    inven_shopId: { tupe: Schema.Types.ObjectId, ref: 'Shop' },
-    inven_reservations: { type: Array, default: [] }
+    inven_reservations: { type: Array, default: [] },
+    inven_location: { type: String, default: 'unknown' },
 }, {
     timestamps: true,
     collection: COLLECTION_NAME

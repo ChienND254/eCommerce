@@ -23,19 +23,57 @@ const getInfoData = <T, K extends keyof T>({ fields = [], object = {} as T }: { 
 }
 
 /**
- * Creates a MongoDB projection object for selecting specific fields.
+ * Removes properties with a value of `null` from an object.
  * 
- * @param {string[]} [select=[]] - An array of field names to select.
+ * @param {Object} obj - The object from which to remove `null` properties.
  * 
- * @returns {Object} An object with the fields as keys and `1` as values.
+ * @returns {void}
  * 
  * @example
- * const fields = ['name', 'email'];
- * const projection = getSelectData(fields);
- * // projection will be { name: 1, email: 1 }
+ * let obj = { name: 'John', age: null, id: 1 };
+ * removeUndefinedObject(obj);
+ * // Now obj will be { name: 'John', id: 1 }
  */
-const getSelectData = (select: string[] = []): Record<string, 1> => {
-    return Object.fromEntries(select.map(el => [el, 1]));
+const removeUndefinedObject = <T extends Record<string, any>>(obj: T): Partial<T> => {
+    console.log(obj);
+
+    Object.keys(obj).forEach((key) => {
+        if (obj[key] === null || obj[key] === undefined) {
+            delete obj[key];
+        }
+    });
+
+    return obj;
 }
 
-export { getInfoData, getSelectData };
+/**
+ * Recursively updates keys in nested objects to have a flat structure.
+ * 
+ * @param {Object} obj - The object to flatten.
+ * 
+ * @returns {Object} A new object with flattened keys.
+ * 
+ * @example
+ * let obj = { user: { info: { name: 'John', age: 30 } } };
+ * const flattenedObj = updateNestedObjectParser(obj);
+ * // flattenedObj will be { 'user.info.name': 'John', 'user.info.age': 30 }
+ */
+const updateNestedObjectParser = (obj: Record<string, any>): Record<string, any> => {
+    const final: Record<string, any> = {};
+
+    Object.keys(obj || {}).forEach(key => {
+        if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
+            const response = updateNestedObjectParser(obj[key]);
+
+            Object.keys(response || {}).forEach(a => {
+                final[`${key}.${a}`] = response[a];
+            });
+        } else {
+            final[key] = obj[key];
+        }
+    });
+
+    return final;
+}
+
+export { getInfoData, removeUndefinedObject, updateNestedObjectParser };

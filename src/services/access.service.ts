@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import KeyTokenService from './keyToken.service';
 import { createTokenPair } from '../auth/authUtils';
-import getInfoData from '../utils';
+import {getInfoData} from '../utils';
 import { AuthFailureError, BadRequestError, ForbiddenError } from '../core/error.response';
 import { findByEmail } from './shop.service';
 import { ObjectId } from 'mongoose';

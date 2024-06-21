@@ -1,5 +1,5 @@
-import { ObjectId } from "mongoose";
-import { IProduct } from "../interface/product";
+import { Document, ObjectId } from "mongoose";
+import { IClothing, IProduct } from "../interface/product";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
 import { 
@@ -9,7 +9,10 @@ import {
     unPublishProductByShop,
     searchProductByUser,
     findAllProducts,
+    findProduct,
+    updateProductById,
 } from "../models/repositories/product.repo";
+import { removeUndefinedObject, updateNestedObjectParser } from "../utils";
 
 class ProductFactory {
 
@@ -27,12 +30,12 @@ class ProductFactory {
         return await productInstance.createProduct();
     }
 
-    static async updateProduct(type: string, data: IProduct): Promise<IProduct> {
+    static async updateProduct(type: string, productId: ObjectId, data: Partial<IProduct>): Promise<IProduct> {
         const productClass = ProductFactory.productRegistry[type]
         if (!productClass) throw new BadRequestError(`Invalid product type ${type}`);
 
         const productInstance = new productClass(data);
-        return await productInstance.createProduct();
+        return await productInstance.updateProduct(productId);
     }
 
     static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}:{product_shop: ObjectId, limit?: number, skip?: number}) : Promise<IProduct[]> {
@@ -65,9 +68,10 @@ class ProductFactory {
         return await findAllProducts({limit, sort, page , filter, select: ['product_name', 'product_price', 'product_thumb']})
     }
 
-    static async findProduct(keySearch: string) {
-        return await searchProductByUser(keySearch)
+    static async findProduct({product_id}:{product_id: ObjectId}) {
+        return await findProduct({product_id, unSelect: ['-__v']});
     }
+
 }
 
 class Product {
@@ -100,8 +104,14 @@ class Product {
         this.product_attributes = product_attributes;
     }
 
-    async createProduct(product_id: ObjectId): Promise<IProduct> {
-        return await productModel.create({ ...this, _id: product_id })
+    //create new product
+    async createProduct(productId: ObjectId): Promise<IProduct> {
+        return await productModel.create({ ...this, _id: productId })
+    }
+
+    //update product
+    async updateProduct (productId: ObjectId, bodyUpdate: Partial<IProduct>): Promise<IProduct| null> {
+        return await updateProductById({productId, bodyUpdate, model: productModel})
     }
 }
 
@@ -117,6 +127,17 @@ class Clothing extends Product {
         if (!newProduct) throw new BadRequestError('create new Clothing error')
 
         return newProduct
+    }
+
+    async updateProduct(productId: ObjectId) {
+        
+        const objectParams: Partial<IProduct> = removeUndefinedObject({...this})
+        if (objectParams.product_attributes) {
+            await updateProductById<IProduct>({ productId, bodyUpdate: updateNestedObjectParser(objectParams.product_attributes), model: clothingModel });
+        }
+
+        const updateProduct = await super.updateProduct(productId, updateNestedObjectParser(objectParams));
+        return updateProduct;
     }
 }
 

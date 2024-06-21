@@ -1,8 +1,7 @@
 import { IProduct } from "../../interface/product";
 import { productModel } from "../product.model";
 import Query from "../../interface/query";
-import { ObjectId, SortOrder } from "mongoose";
-import { getSelectData } from "../../utils";
+import { Model, ObjectId, SortOrder } from "mongoose";
 
 interface QueryParams {
     query: Query;
@@ -10,9 +9,14 @@ interface QueryParams {
     skip: number;
 }
 
+interface UpdateProductParams<T> {
+    productId: ObjectId;
+    bodyUpdate: Partial<T>;
+    model: Model<any>;
+    isNew?: boolean;
+}
 const findAllDraftsForShop = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
     return await queryProduct({ query, limit, skip })
-
 }
 
 const findAllPublishForShop = async ({ query, limit, skip }: QueryParams): Promise<IProduct[]> => {
@@ -29,7 +33,7 @@ const queryProduct = async ({ query, limit, skip }: QueryParams): Promise<IProdu
         .exec()
 }
 
-const publishProductByShop = async ({ product_shop, product_id }: {product_shop: ObjectId, product_id: ObjectId}) => {
+const publishProductByShop = async ({ product_shop, product_id }: { product_shop: ObjectId, product_id: ObjectId }) => {
     const result = await productModel.updateOne(
         { _id: product_id, product_shop: product_shop },
         { $set: { isDraft: false, isPublished: true } }
@@ -38,7 +42,7 @@ const publishProductByShop = async ({ product_shop, product_id }: {product_shop:
     return result.modifiedCount;
 }
 
-const unPublishProductByShop = async ({ product_shop, product_id }: {product_shop: ObjectId, product_id: ObjectId}) => {
+const unPublishProductByShop = async ({ product_shop, product_id }: { product_shop: ObjectId, product_id: ObjectId }) => {
     const result = await productModel.updateOne(
         { _id: product_id, product_shop: product_shop },
         { $set: { isDraft: true, isPublished: false } }
@@ -64,11 +68,21 @@ const findAllProducts = async ({ limit, sort, page, filter, select }: { limit: n
     const products = await productModel.find(filter)
         .sort(sortBy)
         .skip(skip)
-        .select(getSelectData(select))
+        .select(select)
         .lean()
     return products
 }
 
+const findProduct = async ({ product_id, unSelect }: { product_id: ObjectId, unSelect: string[] }): Promise<IProduct | null> => {
+    return await productModel.findById(product_id).select(unSelect)
+}
+
+const updateProductById = async <T>({ productId, bodyUpdate, model, isNew = true }
+    : UpdateProductParams<T>): Promise<T | null> => {
+    return await model.findByIdAndUpdate(productId, bodyUpdate, {
+        new: isNew
+    })
+}
 export {
     findAllDraftsForShop,
     findAllPublishForShop,
@@ -76,4 +90,6 @@ export {
     unPublishProductByShop,
     searchProductByUser,
     findAllProducts,
+    findProduct,
+    updateProductById
 }

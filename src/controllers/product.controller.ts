@@ -18,7 +18,21 @@ class ProductController {
     }
 
     /**
-     * @desc publish product ny shop
+     * @desc Create a new Product
+     * @param {Partial<IProduct>} 
+     * @return {JSON}  
+     */
+    updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+        new SuccessResponse({
+            message: 'update Product success!',
+            metadata: await ProductService.updateProduct(req.body.product_type, req.params.productId as unknown as ObjectId, {
+                ...req.body,
+                product_shop: req.user?.userId,
+            })
+        }).send(res)
+    }
+    /**
+     * @desc publish product by shop
      * @return {JSON}  
      */
     publishProductByShop = async (req: Request, res: Response, next: NextFunction) => {
@@ -85,6 +99,7 @@ class ProductController {
      */
     getListSearchProduct = async (req: Request, res: Response) => {
         const { keySearch } = req.params
+
         new SuccessResponse({
             message: 'getListSearchProduct success!',
             metadata: await ProductService.getListSearchProduct(keySearch as string)
@@ -96,10 +111,26 @@ class ProductController {
      * @param {string} keySearch
      * @return {JSON} 
      */
-    findAllProduct = async (req: Request, res: Response) => {
+    findAllProducts = async (req: Request, res: Response) => {
+        console.log(req.query);
+        
         new SuccessResponse({
             message: 'Get all product success!',
-            metadata: await ProductService.findAllProducts(req.params)
+            metadata: await ProductService.findAllProducts(req.query)
+        }).send(res)
+    }
+
+    /**
+     * @desc find product by id
+     * @param {string} keySearch
+     * @return {JSON} 
+     */
+    findProduct = async (req: Request, res: Response) => {
+        new SuccessResponse({
+            message: 'Get product by id success!',
+            metadata: await ProductService.findProduct({
+                product_id: req.params.product_id as unknown as ObjectId
+            })
         }).send(res)
     }
 }

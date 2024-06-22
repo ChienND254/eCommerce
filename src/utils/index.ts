@@ -34,9 +34,7 @@ const getInfoData = <T, K extends keyof T>({ fields = [], object = {} as T }: { 
  * removeUndefinedObject(obj);
  * // Now obj will be { name: 'John', id: 1 }
  */
-const removeUndefinedObject = <T extends Record<string, any>>(obj: T): Partial<T> => {
-    console.log(obj);
-
+const removeUndefinedObject = <T extends Record<string, any>>(obj: Partial<T>): Partial<T> => {
     Object.keys(obj).forEach((key) => {
         if (obj[key] === null || obj[key] === undefined) {
             delete obj[key];

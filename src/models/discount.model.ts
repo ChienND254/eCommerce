@@ -18,6 +18,7 @@ const discountSchema: Schema = new Schema({
     discount_users_used: { type: Array, default: [] }, // An array of user IDs who have used the discount
     discount_max_uses_per_user: { type: Number, required: true }, // The maximum number of times a single user can use the discount
     discount_min_order_value: { type: Number, required: true }, // The minimum order value required to use the discount
+    discount_max_value: { type: Number, required: true }, // The minimum order value required to use the discount
     discount_shopId: { type: Schema.Types.ObjectId, ref: 'Shop' }, // The ID of the shop offering the discount
     discount_is_active: { type: Boolean, default: true }, // Whether the discount is currently active
     discount_applies_to: { type: String, required: true, enum: ['all', 'specific'] }, // Specifies if the discount applies to 'all' products or 'specific' products

@@ -10,12 +10,13 @@ interface IDiscount extends Document {
     discount_end_date: Date;
     discount_max_uses: number;
     discount_uses_count: number;
-    discount_users_used: string[];
+    discount_users_used: ObjectId[];
     discount_max_uses_per_user: number;
     discount_min_order_value: number;
+    discount_max_value: number;
     discount_shopId: ObjectId;
     discount_is_active: boolean;
     discount_applies_to: string;
-    discount_product_ids: string[];
+    discount_product_ids: ObjectId[];
 }
 export { IDiscount }

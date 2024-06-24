@@ -1,6 +1,7 @@
 import { ObjectId, Document } from "mongoose";
 
 interface IProduct extends Document {
+    productId: ObjectId;
     product_name: string;
     product_thumb: string;
     product_description?: string;

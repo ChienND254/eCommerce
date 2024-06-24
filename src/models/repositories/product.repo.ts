@@ -85,6 +85,10 @@ const updateProductById = async <T>({ productId, bodyUpdate, model, isNew = true
     })
 }
 
+const getProductById = async (productId: ObjectId): Promise<IProduct | null> => {
+    return await productModel.findOne({ _id: productId }).lean()
+}
+
 export {
     findAllDraftsForShop,
     findAllPublishForShop,
@@ -93,5 +97,6 @@ export {
     searchProductByUser,
     findAllProducts,
     findProduct,
-    updateProductById
+    updateProductById,
+    getProductById
 }

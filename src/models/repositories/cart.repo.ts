@@ -1,3 +1,4 @@
+import { ObjectId } from "mongoose";
 import { ICart } from "../../interface/cart";
 import { IProduct } from "../../interface/product";
 import { cartModel } from "../cart.model";
@@ -25,4 +26,8 @@ const updateUserCartQuantity = async ({ userId, product }: { userId: number, pro
     return await cartModel.findOneAndUpdate(query, updateSet, options)
 }
 
-export { createUserCart, updateUserCartQuantity }
+const findCartById = async (cartId: ObjectId): Promise<ICart | null> => {
+    return await cartModel.findOne({ _id: cartId , cart_state: 'active'}).lean()
+}
+
+export { createUserCart, updateUserCartQuantity, findCartById }

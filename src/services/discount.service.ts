@@ -10,10 +10,10 @@ import { removeUndefinedObject } from "../utils";
 interface Params {
     code?: string,
     shopId?: ObjectId,
-    userId?: ObjectId,
+    userId?: number,
     limit?: number,
     page?: number,
-    products?: IProduct[]
+    products?: Array<Partial<IProduct>>
 }
 
 class DiscountService {
@@ -176,8 +176,11 @@ class DiscountService {
 
         let totalOrder: number = 0
         if (discount_min_order_value > 0 && products) {
-            totalOrder = products.reduce((acc, product: IProduct) => {
-                return acc + (product.product_quantity * product.product_price)
+            totalOrder = products.reduce((acc, product) => {
+                if (product && product.product_quantity && product.product_price) {
+                    return acc + (product.product_quantity * product.product_price);
+                }
+                return acc;
             }, 0)
 
             if (totalOrder < discount_min_order_value) {
@@ -196,7 +199,7 @@ class DiscountService {
 
         return {
             totalOrder,
-            dicount: amount,
+            discount: amount,
             totalPrice: totalOrder - amount
         }
     }

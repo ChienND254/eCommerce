@@ -1,7 +1,7 @@
 import { IProduct } from "../../interface/product";
 import { productModel } from "../product.model";
 import Query from "../../interface/query";
-import { Model, ObjectId, SortOrder } from "mongoose";
+import { Model, ObjectId, SortOrder, Types } from "mongoose";
 
 interface QueryParams {
     query: Query;
@@ -89,6 +89,25 @@ const getProductById = async (productId: ObjectId): Promise<IProduct | null> => 
     return await productModel.findOne({ _id: productId }).lean()
 }
 
+const checkProductByServer = async (products: Partial<IProduct>[]):
+    Promise<(Partial<IProduct> | null)[]> => {
+    return await Promise.all(products.map(async product => {
+        if (!product || !product.productId) return null;
+
+        const foundProduct = await getProductById(product.productId);
+
+        if (foundProduct) {
+            return {
+                product_price: foundProduct.product_price,
+                product_quantity: product.product_quantity,
+                productId: product.productId  // Convert ObjectId to string
+            };
+        } else {
+            return null;
+        }
+    }));
+}
+
 export {
     findAllDraftsForShop,
     findAllPublishForShop,
@@ -98,5 +117,6 @@ export {
     findAllProducts,
     findProduct,
     updateProductById,
-    getProductById
+    getProductById,
+    checkProductByServer
 }

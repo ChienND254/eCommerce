@@ -111,11 +111,11 @@ class Product {
         if (!newProduct) {
             throw new BadRequestError('Failed to create product');
         }
-        await insertInventory({
-            productId: newProduct._id as ObjectId,
-            shopId: this.product_shop,
-            stock: this.product_quantity
-        });
+        // await insertInventory({
+        //     productId: newProduct._id as ObjectId,
+        //     shopId: this.product_shop,
+        //     stock: this.product_quantity
+        // });
 
         return newProduct
     }

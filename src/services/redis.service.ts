@@ -1,9 +1,8 @@
 import { ObjectId } from 'mongoose'
-import redis from 'redis'
 import { promisify } from 'util'
 import { reservationInventory } from '../models/repositories/inventory.repo'
-
-const redisClient = redis.createClient()
+import {createClient} from 'redis'
+const redisClient = createClient()
 
 const pexpire = promisify(redisClient.pExpire).bind(redisClient)
 const setnxAsync = promisify(redisClient.setEx).bind(redisClient)

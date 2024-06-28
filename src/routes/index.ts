@@ -6,8 +6,9 @@ import routerInventory from './inventory'
 import routerCart from './cart'
 import routerCheckout from './checkout' 
 import {apiKey, permission} from '../auth/checkAuth';
+import { pushToLogDiscord } from '../middlewares';
 const router = express.Router()
-
+router.use(pushToLogDiscord)
 //check ApiKey
 router.use(apiKey)
 router.use(permission('0000'))

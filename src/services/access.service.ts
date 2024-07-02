@@ -2,7 +2,7 @@ import { shopModel} from '../models/shop.model';
 import { IKeyToken } from '../interface/keytoken';
 import { IShop } from '../interface/shop';
 import bcrypt from 'bcrypt';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 import KeyTokenService from './keyToken.service';
 import { createTokenPair } from '../auth/authUtils';
 import {getInfoData} from '../utils';

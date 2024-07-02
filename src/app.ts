@@ -4,7 +4,8 @@ import helmet from 'helmet';
 import compression from 'compression';
 import router from './routes/index'
 import {StatusCodes, ReasonPhrases} from '../src/utils/httpStatusCode'
-require('dotenv').config()
+import 'dotenv/config';
+
 const app = express();
 const logger = morgan('dev')
 //inti middleware
@@ -31,6 +32,7 @@ app.use((error: Error & { status?: number }, req: Request, res: Response, next: 
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
+        stack: error.stack,
         message: error.message || ReasonPhrases.INTERNAL_SERVER_ERROR
     })
 })

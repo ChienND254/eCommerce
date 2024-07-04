@@ -2,6 +2,7 @@ import { ObjectId } from "mongoose";
 import { CommentModel } from "../models/comment.model";
 import { NotFoundError } from "../core/error.response";
 import { IComment } from "../interface/comment";
+import { findProduct } from "../models/repositories/product.repo";
 
 class CommentService {
     static async createComment(
@@ -83,6 +84,41 @@ class CommentService {
         })
 
         return comments
+    }
+
+    static async deleteComment({commentId, productId}:{commentId: ObjectId, productId: ObjectId }): Promise<boolean>{
+        const foundProduct = await findProduct({product_id: productId, unSelect: null})
+        if (!foundProduct) throw new NotFoundError("product not found")
+
+        const foundComment = await CommentModel.findById(commentId)
+
+        if (!foundComment) throw new NotFoundError("comment not found")
+
+        const leftValue: number = foundComment.comment_left
+        const rightValue: number = foundComment.comment_right
+
+        const width: number = rightValue - leftValue + 1
+
+        await CommentModel.deleteMany({
+            comment_productId: productId,
+            comment_left: { $gte: leftValue, $lte: rightValue}
+        })
+
+        await CommentModel.updateMany({
+            comment_productId: productId,
+            comment_right: { $gt: rightValue}
+        }, {
+            $inc: {comment_right: -width}
+        })
+
+        await CommentModel.updateMany({
+            comment_productId: productId,
+            comment_left: { $gt: rightValue}
+        }, {
+            $inc: {comment_left: -width}
+        })
+
+        return true
     }
 }
 

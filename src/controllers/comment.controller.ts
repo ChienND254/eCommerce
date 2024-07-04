@@ -30,8 +30,19 @@ class CommentController {
     getComment = async (req: Request, res: Response, next: NextFunction) => {
         const query: CommentQueryParams = req.query as unknown as CommentQueryParams;
         new SuccessResponse({
-            message: 'Create New Comment Success',
+            message: 'get Comment',
             metadata: await CommentService.getCommentByParentId(query)
+        }).send(res)
+    }
+
+    /**
+     * @desc delete comment
+     * @return {JSON} 
+     */
+    deleteComment = async (req: Request, res: Response, next: NextFunction) => {
+        new SuccessResponse({
+            message: 'delete comment',
+            metadata: await CommentService.deleteComment(req.body)
         }).send(res)
     }
 }

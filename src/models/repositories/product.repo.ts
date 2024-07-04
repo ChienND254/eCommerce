@@ -74,8 +74,11 @@ const findAllProducts = async ({ limit, sort, page, filter, select }: { limit: n
     return products
 }
 
-const findProduct = async ({ product_id, unSelect }: { product_id: ObjectId, unSelect: string[] }): Promise<IProduct | null> => {
-    return await productModel.findById(product_id).select(unSelect)
+const findProduct = async ({ product_id, unSelect}: { product_id: ObjectId, unSelect: string[] | null }): Promise<IProduct | null> => {
+    if (unSelect) {
+        return await productModel.findById(product_id).select(unSelect)
+    }
+    return await productModel.findById(product_id)
 }
 
 const updateProductById = async <T>({ productId, bodyUpdate, model, isNew = true }

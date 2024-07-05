@@ -1,7 +1,7 @@
 import { ObjectId } from "mongoose";
 import { CommentModel } from "../models/comment.model";
 import { NotFoundError } from "../core/error.response";
-import { IComment } from "../interface/comment";
+import { IComment } from "../interfaces";
 import { findProduct } from "../models/repositories/product.repo";
 
 class CommentService {

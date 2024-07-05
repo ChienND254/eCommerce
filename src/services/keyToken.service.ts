@@ -1,6 +1,6 @@
 import { keyTokenModel } from '../models/keytoken.model';
 import { ObjectId, Types } from 'mongoose';
-import { IKeyToken } from '../interface/keytoken';
+import { IKeyToken } from '../interfaces';
 
 interface CreateKeyTokenParams {
     userId: ObjectId;

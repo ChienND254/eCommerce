@@ -1,9 +1,8 @@
 import { ObjectId } from "mongoose";
 import { BadRequestError, NotFoundError } from "../core/error.response";
-import { IDiscount } from "../interface/discount";
 import { discountModel } from "../models/discount.model";
 import { findAllProducts } from "../models/repositories/product.repo";
-import { IProduct } from "../interface/product";
+import { IProduct, IDiscount } from "../interfaces";
 import { checkDiscountExists, findAllDiscountCodesUnSelect, updateDiscountById } from "../models/repositories/discount.repo";
 import { removeUndefinedObject } from "../utils";
 

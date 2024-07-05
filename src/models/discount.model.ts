@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { IDiscount } from '../interface/discount';
+import { IDiscount } from '../interfaces';
 
 const DOCUMENT_NAME: string = 'Discount';
 const COLLECTION_NAME: string = 'discounts';

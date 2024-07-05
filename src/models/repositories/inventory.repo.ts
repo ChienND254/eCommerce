@@ -1,6 +1,6 @@
 import { ObjectId } from "mongoose"
 import { InventoryModel } from "../inventory.model"
-import { IInventory } from "../../interface/inventory"
+import { IInventory } from "../../interfaces"
 
 const insertInventory = async ({ productId, shopId, stock, location = 'unknown' }:
     { productId: ObjectId, shopId: ObjectId, stock: number, location?: string }

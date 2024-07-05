@@ -1,6 +1,5 @@
 import { shopModel} from '../models/shop.model';
-import { IKeyToken } from '../interface/keytoken';
-import { IShop } from '../interface/shop';
+import { IKeyToken, IShop } from '../interfaces';
 import bcrypt from 'bcrypt';
 import crypto from 'node:crypto';
 import KeyTokenService from './keyToken.service';

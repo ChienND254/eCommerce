@@ -1,5 +1,5 @@
 import { apiKeyModel } from "../models/apikey.model"
-import { IApiKey } from "../interface/apikey"
+import { IApiKey } from "../interfaces"
 
 const findByID = async (key: string): Promise<IApiKey | null> => {
     const objKey: IApiKey | null = await apiKeyModel.findOne({ key, status: true }).lean()

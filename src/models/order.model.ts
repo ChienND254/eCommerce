@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { IInventory } from '../interface/inventory';
+import { IInventory } from '../interfaces';
 
 const DOCUMENT_NAME: string = 'Order'
 const COLLECTION_NAME: string = 'Orders'

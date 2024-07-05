@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { IClothing, IElectronics, IProduct, IFurniture } from '../interface/product';
+import { IClothing, IElectronics, IProduct, IFurniture } from '../interfaces';
 import slugify from 'slugify';
 
 const DOCUMENT_NAME: string = 'Product';

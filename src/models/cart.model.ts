@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { ICart } from '../interface/cart';
+import { ICart } from '../interfaces';
 
 const DOCUMENT_NAME: string = 'Cart';
 const COLLECTION_NAME: string = 'Carts';

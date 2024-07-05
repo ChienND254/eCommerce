@@ -1,5 +1,5 @@
 import { Model, ObjectId, SortOrder } from "mongoose";
-import { IDiscount } from "../../interface/discount";
+import { IDiscount } from "../../interfaces";
 
 interface Params {
     limit?: number;

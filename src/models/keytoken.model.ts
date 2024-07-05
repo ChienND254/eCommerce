@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { IKeyToken } from '../interface/keytoken';
+import { IKeyToken } from '../interfaces';
 
 const DOCUMENT_NAME: string = 'Key'
 const COLLECTION_NAME: string = 'Keys'

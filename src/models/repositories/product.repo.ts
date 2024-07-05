@@ -1,6 +1,6 @@
-import { IProduct } from "../../interface/product";
+import { IProduct } from "../../interfaces";
 import { productModel } from "../product.model";
-import Query from "../../interface/query";
+import Query from "../../interfaces/query";
 import { Model, ObjectId, SortOrder, Types } from "mongoose";
 
 interface QueryParams {

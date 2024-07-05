@@ -4,7 +4,7 @@ import { AuthFailureError, NotFoundError } from '../core/error.response';
 import KeyTokenService from '../services/keyToken.service';
 import { NextFunction, Request, Response } from 'express';
 import { ObjectId } from 'mongoose';
-import { IKeyToken } from '../interface/keytoken';
+import { IKeyToken } from '../interfaces';
 
 interface TokenPayload {
     userId: ObjectId;

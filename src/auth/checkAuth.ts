@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { findByID } from '../services/apiKey.service';
-import { IApiKey } from '../interface/apikey';
+import { IApiKey } from '../interfaces';
 import { BadRequestError } from '../core/error.response';
 
 const HEADER = {

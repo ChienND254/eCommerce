@@ -1,10 +1,9 @@
-import { IProduct } from "../interface/product";
 import { cartModel } from "../models/cart.model";
 import { createUserCart, updateUserCartQuantity } from "../models/repositories/cart.repo";
 import { getProductById } from "../models/repositories/product.repo";
 import { NotFoundError } from "../core/error.response";
 import { ObjectId } from "mongoose";
-import { ICart } from "../interface/cart";
+import { ICart, IProduct } from "../interfaces";
 
 class CartService {
 

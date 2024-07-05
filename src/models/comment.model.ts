@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { IComment } from '../interface/comment'
+import { IComment } from '../interfaces'
 const DOCUMENT_NAME: string = 'Comment'
 const COLLECTION_NAME: string = 'Comments'
 

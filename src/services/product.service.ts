@@ -1,5 +1,5 @@
 import { ObjectId } from "mongoose";
-import { IProduct } from "../interface/product";
+import { IProduct } from "../interfaces";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
 import { 
@@ -111,11 +111,11 @@ class Product {
         if (!newProduct) {
             throw new BadRequestError('Failed to create product');
         }
-        // await insertInventory({
-        //     productId: newProduct._id as ObjectId,
-        //     shopId: this.product_shop,
-        //     stock: this.product_quantity
-        // });
+        await insertInventory({
+            productId: newProduct._id as ObjectId,
+            shopId: this.product_shop,
+            stock: this.product_quantity
+        });
 
         return newProduct
     }

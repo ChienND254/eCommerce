@@ -3,7 +3,7 @@ import { findCartById } from "../models/repositories/cart.repo";
 import { BadRequestError } from "../core/error.response";
 import { checkProductByServer } from "../models/repositories/product.repo";
 import DiscountService from "./discount.service";
-import { IProduct } from "../interface/product";
+import { IProduct } from "../interfaces";
 import { acquireLock, releaseLock } from "./redis.service";
 import { OrderModel } from "../models/order.model";
 import { CartService } from "./cart.service";

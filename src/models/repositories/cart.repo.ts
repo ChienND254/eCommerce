@@ -1,6 +1,5 @@
 import { ObjectId } from "mongoose";
-import { ICart } from "../../interface/cart";
-import { IProduct } from "../../interface/product";
+import { IProduct, ICart } from "../../interfaces";
 import { cartModel } from "../cart.model";
 
 const createUserCart = async ({ userId, product }: { userId: number, product: Partial<IProduct> }): Promise<ICart | null> => {

@@ -6,6 +6,7 @@ import routerInventory from './inventory'
 import routerCart from './cart'
 import routerComment from './comment'
 import routerCheckout from './checkout' 
+import routerNotification from './notification' 
 import {apiKey, permission} from '../auth/checkAuth';
 import { pushToLogDiscord } from '../middlewares';
 const router = express.Router()
@@ -21,6 +22,7 @@ router.use('/v1/api/inventory', routerInventory)
 router.use('/v1/api/cart', routerCart)
 router.use('/v1/api/product', routerProduct)
 router.use('/v1/api/comment', routerComment)
+router.use('/v1/api/notification', routerNotification)
 router.use('/v1/api', routerAccess)
 
 export default router

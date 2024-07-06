@@ -2,8 +2,8 @@ import { ObjectId } from "mongoose";
 import { IProduct } from "../interfaces";
 import { productModel, clothingModel, electronicsModel, furnitureModel } from "../models/product.model";
 import { BadRequestError } from "../core/error.response";
-import { 
-    findAllDraftsForShop, 
+import {
+    findAllDraftsForShop,
     publishProductByShop,
     findAllPublishForShop,
     unPublishProductByShop,
@@ -14,12 +14,14 @@ import {
 } from "../models/repositories/product.repo";
 import { removeUndefinedObject, updateNestedObjectParser } from "../utils";
 import { insertInventory } from "../models/repositories/inventory.repo";
+import notificationService from "./notification.service";
+import { NotificationTypes } from "../utils/notificationTypes";
 
 class ProductFactory {
 
     static productRegistry: { [key: string]: any } = {};
 
-    static registerProductType (type:string,classRef: any) {
+    static registerProductType(type: string, classRef: any) {
         ProductFactory.productRegistry[type] = classRef
     }
 
@@ -39,38 +41,38 @@ class ProductFactory {
         return await productInstance.updateProduct(productId);
     }
 
-    static async findAllDraftsForShop({product_shop, limit = 50, skip = 0}:{product_shop: ObjectId, limit?: number, skip?: number}) : Promise<IProduct[]> {
+    static async findAllDraftsForShop({ product_shop, limit = 50, skip = 0 }: { product_shop: ObjectId, limit?: number, skip?: number }): Promise<IProduct[]> {
         if (!product_shop) throw new BadRequestError('Invalid Request')
-        const query = {product_shop, isDraft: true}
-        
-        return await findAllDraftsForShop({query, limit, skip})
+        const query = { product_shop, isDraft: true }
+
+        return await findAllDraftsForShop({ query, limit, skip })
     }
 
-    static async findAllPublishForShop({product_shop, limit = 50, skip = 0}:{product_shop: ObjectId, limit?: number, skip?: number}) : Promise<IProduct[]> {
+    static async findAllPublishForShop({ product_shop, limit = 50, skip = 0 }: { product_shop: ObjectId, limit?: number, skip?: number }): Promise<IProduct[]> {
         if (!product_shop) throw new BadRequestError('Invalid Request')
-        const query = {product_shop, isPublished: true}
-        
-        return await findAllPublishForShop({query, limit, skip})
+        const query = { product_shop, isPublished: true }
+
+        return await findAllPublishForShop({ query, limit, skip })
     }
 
-    static async publishProductByShop({product_shop, product_id}:{product_shop: ObjectId, product_id: ObjectId}) {
-        return await publishProductByShop({product_shop, product_id})
+    static async publishProductByShop({ product_shop, product_id }: { product_shop: ObjectId, product_id: ObjectId }) {
+        return await publishProductByShop({ product_shop, product_id })
     }
 
-    static async unPublishProductByShop({product_shop, product_id}:{product_shop: ObjectId, product_id: ObjectId}): Promise<number> {
-        return await unPublishProductByShop({product_shop, product_id})
+    static async unPublishProductByShop({ product_shop, product_id }: { product_shop: ObjectId, product_id: ObjectId }): Promise<number> {
+        return await unPublishProductByShop({ product_shop, product_id })
     }
 
     static async getListSearchProduct(keySearch: string) {
         return await searchProductByUser(keySearch)
     }
 
-    static async findAllProducts({limit = 50, sort = 'ctime', page = 1, filter = {isPublished: true}}) {
-        return await findAllProducts({limit, sort, page , filter, select: ['product_name', 'product_price', 'product_thumb']})
+    static async findAllProducts({ limit = 50, sort = 'ctime', page = 1, filter = { isPublished: true } }) {
+        return await findAllProducts({ limit, sort, page, filter, select: ['product_name', 'product_price', 'product_thumb'] })
     }
 
-    static async findProduct({product_id}:{product_id: ObjectId}) {
-        return await findProduct({product_id, unSelect: ['-__v']});
+    static async findProduct({ product_id }: { product_id: ObjectId }) {
+        return await findProduct({ product_id, unSelect: ['-__v'] });
     }
 
 }
@@ -84,7 +86,7 @@ class Product {
     product_type: string;
     product_shop: ObjectId;
     product_attributes: any;
-    
+
     constructor({
         product_name,
         product_thumb,
@@ -117,12 +119,21 @@ class Product {
             stock: this.product_quantity
         });
 
+        notificationService.pushNotiToSystem({
+            type: NotificationTypes.SHOP_001,
+            receivedId: 1,
+            senderId: this.product_shop,
+            options: {
+                product_name: this.product_name,
+                shop_name: this.product_shop
+            }
+        }).then(rs => console.log(rs)).catch(console.error);
         return newProduct
     }
 
     //update product
-    async updateProduct (productId: ObjectId, bodyUpdate: Partial<IProduct>): Promise<IProduct| null> {
-        return await updateProductById({productId, bodyUpdate, model: productModel})
+    async updateProduct(productId: ObjectId, bodyUpdate: Partial<IProduct>): Promise<IProduct | null> {
+        return await updateProductById({ productId, bodyUpdate, model: productModel })
     }
 }
 
@@ -141,8 +152,8 @@ class Clothing extends Product {
     }
 
     async updateProduct(productId: ObjectId) {
-        
-        const objectParams: Partial<IProduct> = removeUndefinedObject({...this})
+
+        const objectParams: Partial<IProduct> = removeUndefinedObject({ ...this })
         if (objectParams.product_attributes) {
             await updateProductById<IProduct>({ productId, bodyUpdate: updateNestedObjectParser(objectParams.product_attributes), model: clothingModel });
         }

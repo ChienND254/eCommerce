@@ -1,4 +1,5 @@
 import { Document, ObjectId } from "mongoose";
+import { NotificationType } from "../utils/notificationTypes";
 
 export interface IApiKey extends Document {
     key: string;
@@ -109,7 +110,7 @@ export interface IInventory extends Document {
 }
 
 export interface IKeyToken extends Document {
-    user: ObjectId; 
+    user: ObjectId;
     publicKey: string;
     privateKey: string;
     refreshToken: string;
@@ -119,13 +120,13 @@ export interface IKeyToken extends Document {
 }
 
 export interface INotification extends Document {
-  noti_type: 'ORDER-001' | 'ORDER-002' | 'PROMOTION-001' | 'SHOP-001';
-  noti_senderId: number;
-  noti_receivedId: number;
-  noti_content: string;
-  noti_options: Record<string, any>;
-  createdAt?: Date;
-  updatedAt?: Date;
+    noti_type: NotificationType;
+    noti_senderId: number;
+    noti_receivedId: number;
+    noti_content: string;
+    noti_options: Record<string, any>;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IOrder extends Document {

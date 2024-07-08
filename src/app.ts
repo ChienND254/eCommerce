@@ -5,6 +5,7 @@ import compression from 'compression';
 import router from './routes/index'
 import {StatusCodes, ReasonPhrases} from '../src/utils/httpStatusCode'
 import 'dotenv/config';
+import cors from 'cors'
 
 const app = express();
 const logger = morgan('dev')
@@ -16,8 +17,9 @@ app.use(express.json())
 app.use(express.urlencoded({
     extended: true
 }))
+app.use(cors())
 //init db
-import('./dbs/init.mongodb')
+import('./databases/init.mongodb')
 //init routes
 app.use('/', router)
 
@@ -32,7 +34,7 @@ app.use((error: Error & { status?: number }, req: Request, res: Response, next: 
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
-        stack: error.stack,
+        // stack: error.stack,
         message: error.message || ReasonPhrases.INTERNAL_SERVER_ERROR
     })
 })

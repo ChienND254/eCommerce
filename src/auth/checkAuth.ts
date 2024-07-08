@@ -24,6 +24,8 @@ const apiKey = async (req: CustomRequest, res: Response, next: NextFunction): Pr
         return next(new BadRequestError('Forbidden Error: Invalid API key'))
     }    
     req.objKey = objKey;
+    console.log(key);
+    
     next()
 }
 

@@ -1,5 +1,5 @@
 import app from './src/app'
-import config from './src/configs/config.mongodb'
+import config from './src/configs/mongodb.config'
 
 const PORT = config.app.port
 const server = app.listen(PORT, () => {

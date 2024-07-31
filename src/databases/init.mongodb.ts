@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import {countConnect} from '../helpers/check.connect';
-import config from '../configs/config.mongodb'
+import config from '../configs/mongodb.config'
 
 const {host, port, name} = config.db
 const connectString: string = `mongodb://${host}:${port}/${name}`;

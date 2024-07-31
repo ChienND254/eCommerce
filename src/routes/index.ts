@@ -8,6 +8,7 @@ import routerComment from './comment'
 import routerCheckout from './checkout' 
 import routerNotification from './notification' 
 import {apiKey, permission} from '../auth/checkAuth';
+import routerUpload from './upload'
 import { pushToLogDiscord } from '../middlewares';
 const router = express.Router()
 // router.use(pushToLogDiscord)
@@ -23,6 +24,7 @@ router.use('/api/v1/cart', routerCart)
 router.use('/api/v1/product', routerProduct)
 router.use('/api/v1/comment', routerComment)
 router.use('/api/v1/notification', routerNotification)
+router.use('/api/v1/upload', routerUpload) 
 router.use('/api/v1', routerAccess)
 
 export default router

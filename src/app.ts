@@ -1,10 +1,12 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from 'express';
 import morgan from 'morgan'
 import helmet from 'helmet';
 import compression from 'compression';
 import router from './routes/index'
 import {StatusCodes, ReasonPhrases} from '../src/utils/httpStatusCode'
-import 'dotenv/config';
 import cors from 'cors'
 
 const app = express();
@@ -34,7 +36,7 @@ app.use((error: Error & { status?: number }, req: Request, res: Response, next: 
     return res.status(statusCode).json({
         status: 'error',
         code: statusCode,
-        // stack: error.stack,
+        stack: error.stack,
         message: error.message || ReasonPhrases.INTERNAL_SERVER_ERROR
     })
 })

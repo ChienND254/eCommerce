@@ -2,7 +2,45 @@
 // upload from url image
 
 import cloudinary from "../configs/cloundinary.config"
+import crypto from 'node:crypto'
+import { PutObjectCommand, GetObjectCommand, s3Client } from '../configs/s3.config'
+// import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { getSignedUrl } from "@aws-sdk/cloudfront-signer";
+const randomImageName = () => crypto.randomBytes(16).toString('hex')
+const uploadImageFromLocalS3 = async (file: Express.Multer.File) => {
+    try {
+        const imageName = randomImageName()
 
+        const command = new PutObjectCommand({
+            Bucket: process.env.AWS_BUCKET_NAME,
+            Key: imageName,
+            Body: file.buffer,
+            ContentType: 'image/jpeg'
+        })
+
+        const result = await s3Client.send(command)
+
+        // const signedUrl = new GetObjectCommand({
+        //     Bucket: process.env.AWS_BUCKET_NAME,
+        //     Key: imageName
+        // })
+        // const url = await getSignedUrl(s3Client, signedUrl, { expiresIn: 3600 });
+
+        const signedUrl = getSignedUrl({
+            url: `${process.env.URL_CLOUDFRONT_S3}/${imageName}`,
+            keyPairId: process.env.CLOUDFRONT_S3_PUBLIC_KEY_ID!,
+            dateLessThan: new Date(Date.now() + 60 * 1000).toISOString(),
+            privateKey: process.env.AWS_S3_BUCKET_PRIVATE_KEY!,
+        });
+        return {
+            signedUrl,
+            result
+        };
+
+    } catch (error) {
+        console.error(error);
+    }
+}
 const uploadImageFromUrl = async () => {
     try {
         const urlImage: string = 'https://down-vn.img.susercontent.com/file/vn-11134258-7r98o-ly4uncqs4jv44b'
@@ -74,4 +112,4 @@ const uploadImageFromLocalFiles = async (files: Express.Multer.File[], folderNam
     }
 }
 
-export { uploadImageFromUrl, uploadImageFromLocal, uploadImageFromLocalFiles }
+export { uploadImageFromUrl, uploadImageFromLocal, uploadImageFromLocalFiles, uploadImageFromLocalS3 }

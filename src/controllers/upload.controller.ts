@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import {uploadImageFromLocal, uploadImageFromLocalFiles, uploadImageFromUrl} from '../services/upload.service';
+import {uploadImageFromLocal, uploadImageFromLocalFiles, uploadImageFromLocalS3, uploadImageFromUrl} from '../services/upload.service';
 import { SuccessResponse } from '../core/success.response';
 import { BadRequestError } from '../core/error.response';
 
@@ -36,6 +36,21 @@ class UploadController {
             message: 'upload success',
             metadata: await uploadImageFromLocalFiles(
                 files
+            )
+        }).send(res)
+    }
+
+    uploadImageFromLocalS3 = async (req: Request, res: Response, next: NextFunction) => {
+        const { file } = req
+
+        if (!file) {
+            throw new BadRequestError('File missing');
+        }
+        
+        new SuccessResponse({
+            message: 'upload success',
+            metadata: await uploadImageFromLocalS3(
+                file
             )
         }).send(res)
     }
